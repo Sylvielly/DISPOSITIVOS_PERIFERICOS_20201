@@ -28,7 +28,6 @@ signed long int digital_velocidade = 0;
 signed long int AD3=0;
 static boolean led;
 signed long int integral=0;
-//float KI=0.09;
 float KI=0.09;
 signed long int fator;
 signed long int setpoint_RPM=0;
@@ -43,12 +42,10 @@ void serial(){
    u=getc()-48;                  //48 corresponde ao valor do caractere 0 da tabela ASCII.
                            
    setpoint_RPM=(1000*m)+(100*c)+(10*d)+(1*u);
-   
-   //PWM_SET = fator*2.5;
    if (setpoint_RPM > 5000){
          setpoint_RPM = 5000;
       }
-      digital_entrada = setpoint_RPM*0.2046;
+         digital_entrada = setpoint_RPM*0.2046;
    }
 
 #int_timer0
@@ -106,17 +103,8 @@ void main(){
             AD3 = read_adc();
             delay_us(100);
             digital_velocidade = AD3;                      //conversao da unidade de engenharia lida em AD3 para velocidade do motor
-   //fim leitura entrada analogica de velocidade
-                
-                
-            /*if (proporcional>1023){
-                  proporcional = 1023;
-               }*/                   
+   //fim leitura entrada analogica de velocidade                   
                 saida_atual = proporcional+INTEGRAL_SYS;                          
-            
-            /*if (saida_atual>1950){
-                     saida_atual = 1950;
-            }*/
                 PWM_CONFIG = (saida_atual*0.2443792766);               
             if(PWM_CONFIG>=250){
                   PWM_CONFIG = 250;
@@ -127,15 +115,10 @@ void main(){
                set_pwm1_duty(PWM_CONFIG);             //configura razao ciclica [duty cycle = ton / ton+toff]
                setup_ccp1(CCP_PWM);                   //envia valor pwm configurado para pino /ccp1
                
-         printf("\r\n SETPOINT = %li \r\n ", setpoint_RPM);
+         printf("\r\n SETPOINT = %li \r\n ",setpoint_RPM);
          printf(" \r\n AD3 = %li \r\n ",AD3); 
-         //printf(" \r\nDIGITAL ENTRADA = %f \r\n ",digital_entrada);
-         printf(" \r\nDIGITAL VELOCIDADE = %li \r\n ",digital_velocidade*4.887585533);
-         //printf(" \r\nSAIDA_ATUAL = %lu \r\n ",erro);
-         //printf(" \r\nPROPORCIONAL = %f \r\n ",proporcional);
-         //printf(" \r\nINTEGRAL = %f \r\n ",integral);
-         //printf(" \r\nSAIDA_ATUAL = %f \r\n ",saida_atual);
-         printf(" \r\nVALOR PWM = %li \r\n ",PWM_CONFIG);
+         printf(" \r\n VELOCIDADE ATUAL = %li \r\n ",digital_velocidade*4.887585533)
+         printf(" \r\n VALOR PWM = %li \r\n ",PWM_CONFIG);
 
          //fim configuracao pwm com condicao para 'pwm_config' para nao passar dos 250 (100% pwm)
          
