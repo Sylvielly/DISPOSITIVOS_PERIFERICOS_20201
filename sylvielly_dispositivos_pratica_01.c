@@ -19,19 +19,19 @@ int32 d;
 int32 u;
 signed long int porcentagem = 0;
 signed long int PWM_CONFIG = 0;
-signed long int digital_entrada=0;
-signed long int proporcional=0;
-signed long int erro=0;
-signed long int saida_atual=0;
+signed long int digital_entrada = 0;
+signed long int proporcional = 0;
+signed long int erro = 0;
+signed long int saida_atual = 0;
 float KP = 0.1;
 signed long int digital_velocidade = 0;
-signed long int AD3=0;
+signed long int AD3 = 0;
 static boolean led;
-signed long int integral=0;
-float KI=0.09;
-signed long int fator;
-signed long int setpoint_RPM=0;
-signed long int INTEGRAL_SYS=0;
+signed long int integral = 0;
+float KI = 0.09;
+signed long int setpoint_RPM = 0;
+signed long int velocidade_RPM_atual = 0;
+signed long int INTEGRAL_SYS = 0;
 //float PWM_SET;
 
 #int_rda                          //interrupcao para serial
@@ -76,8 +76,6 @@ void funcao_tempo(){
       }
       
       }
-      
-   
 void main(){  
       
       //configuracao timer0 para execucao do controlador
@@ -114,10 +112,10 @@ void main(){
                }
                set_pwm1_duty(PWM_CONFIG);             //configura razao ciclica [duty cycle = ton / ton+toff]
                setup_ccp1(CCP_PWM);                   //envia valor pwm configurado para pino /ccp1
-               
+         velocidade_RPM_atual = digital_velocidade*4.887585533;      
          printf("\r\n SETPOINT = %li \r\n ",setpoint_RPM);
          printf(" \r\n AD3 = %li \r\n ",AD3); 
-         printf(" \r\n VELOCIDADE ATUAL = %li \r\n ",digital_velocidade*4.887585533)
+         printf(" \r\n VELOCIDADE ATUAL = %li \r\n ",velocidade_RPM_atual);
          printf(" \r\n VALOR PWM = %li \r\n ",PWM_CONFIG);
 
          //fim configuracao pwm com condicao para 'pwm_config' para nao passar dos 250 (100% pwm)
