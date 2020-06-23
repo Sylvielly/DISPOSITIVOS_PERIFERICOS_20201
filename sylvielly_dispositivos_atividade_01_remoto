@@ -29,7 +29,12 @@ void main(){
                   while(true){
                   
                       //INSERIR LACO FOR DESDE QUE O NOME 'IFCE' SE MOVA NO LCD
-                      
+                      /*
+                          for(number = 0; number < 16; number+=2)
+                          lcd_gotoxy(1,1);      //LCD Coluna x Linha
+                          printf(lcd_putc,"\f  IFCE  ", );            
+                          
+                      */
                       lcd_gotoxy(1,1);      //LCD Coluna x Linha
                       printf(lcd_putc,"\f  Temporizador  ", );              //o \f LIMPA ANTES DA ESCRITA
                       lcd_gotoxy(1,2);      //LCD COLUNA x LINHA (TIPO 16C x 2L)
