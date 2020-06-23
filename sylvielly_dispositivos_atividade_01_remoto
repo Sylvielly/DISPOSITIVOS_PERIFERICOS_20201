@@ -1,0 +1,44 @@
+/*INSTITUTO FEDERAL DO CEARÁ (IFCE)*/
+/*BACHARELADO EM ENGENHARIA DE CONTROLE E AUTOMAÇÃO*/
+/*DISPOSITIVOS PERIFERICOS*/
+//PROGRAMAS PROF. FABIO
+//SEMESTRE 2020.1
+
+//EXEMPLO APOSTILA PROF. FÁBIO TIMBÓ PÁG 90
+//ATIVIDADE 01: ALTERAR P90 PARA CONFIGURAR DISPLAY LCD DE ACORDO COM VIDEO F1 (CLASSROOM) - LACO FOR
+
+
+//INICIO CABECALHO PADRAO
+#include <18F4550.h>
+#fuses HS, CPUDIV1,PLL5,USBDIV
+#use delay(clock=20000000)
+//FIM CABECALHO PADRAO
+
+//HABILITACAO DA BIBLIOTECA DO LCD
+#use standard_io(B)               //COMENTAR LINHA CASO A BIBLIOTECA DO LCD SEJA DIFERENTE
+#define use_portB_lcd TRUE        //COMENTAR LINHA CASO A BIBLIOTECA DO LCD SEJA DIFERENTE
+#define LCD_TYPE 2
+#include <LCD.c>
+
+//DECLARACAO DE VARIAVEIS
+unsigned int32 n = 0;
+
+//INICIO DE PROGRAMA
+void main(){
+              lcd_init();         //INICIALIZACAO DO LCD
+                  while(true){
+                  
+                      //INSERIR LACO FOR DESDE QUE O NOME 'IFCE' SE MOVA NO LCD
+                      
+                      lcd_gotoxy(1,1);      //LCD Coluna x Linha
+                      printf(lcd_putc,"\f  Temporizador  ", );              //o \f LIMPA ANTES DA ESCRITA
+                      lcd_gotoxy(1,2);      //LCD COLUNA x LINHA (TIPO 16C x 2L)
+                      printf(lcd_putc,"        %lu ",n);       
+                      
+                      delay_ms(1000);
+                      n = n+1;
+                      }
+                      
+                      //PROGRAMA MOSTRA UM TEMPORIZADOR
+
+            }
