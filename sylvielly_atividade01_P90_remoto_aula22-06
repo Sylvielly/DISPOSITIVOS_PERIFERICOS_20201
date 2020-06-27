@@ -22,20 +22,16 @@
 //DECLARACAO DE VARIAVEIS
 
 unsigned int32 n = 0;              //VARIAVEL DO TIPO 'INT32' NÃO SINALIZADA
-unsigned int32 number = 0;         //VARIAVEL PARA LACO 'FOR'
 
 //INICIO DE PROGRAMA
 
 void main(){
          lcd_init();          //INICIALIZACAO DO LCD
                while(true){
-               
-               //INSERIR LACO FOR DESDE QUE O NOME 'IFCE' SE MOVA NO LCD
-                  for(number = 0; number < 16; number+=1){                        
+                                     
                         lcd_gotoxy(1,1);                              
                         printf(lcd_putc,"IFCE",);
-                  }
-                     
+                        
                      delay_ms(1000);
                      n=n+1;
                            
