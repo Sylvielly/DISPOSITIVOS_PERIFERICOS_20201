@@ -22,19 +22,41 @@
 //DECLARACAO DE VARIAVEIS
 
 unsigned int32 n = 0;              //VARIAVEL DO TIPO 'INT32' NÃO SINALIZADA
+unsigned int32 n2 = 0;
+unsigned int32 number = 0;
+unsigned int32 number2 = 0;
 
 //INICIO DE PROGRAMA
 
 void main(){
          lcd_init();          //INICIALIZACAO DO LCD
                while(true){
-                                     
-                        lcd_gotoxy(1,1);                              
-                        printf(lcd_putc,"IFCE",);
-                        
-                     delay_ms(1000);
-                     n=n+1;
+                  
+                    if((n = 0)||(n<=16)){
+                           lcd_gotoxy(1,1);
+                           printf(lcd_putc,"\f");
+                           lcd_gotoxy((number+=1),1);                              
+                           printf(lcd_putc,"IFCE",);
+                           delay_ms(500);
+                    }
+                    
+                    if((n2 = 0)||(n2<=16)){
+                           lcd_gotoxy(1,2);
+                           printf(lcd_putc,"\f",);
+                           lcd_gotoxy((number2+=1),2);
+                           printf(lcd_putc,"IFCE",);
+                           delay_ms(500);
+                           printf(lcd_putc,"\f",);
+                    }
+                     
+                     n+=1;
+                     n2+=1;
+                     
+                     //if((n>16)||(n2>16)){
+                       // n = 0;
+                       // n2 = 0;
+                     //}
                            
                }
 }
-//FIM DE PROGRAMA
+//FIM DE PROGRAMA           
