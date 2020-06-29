@@ -1,5 +1,6 @@
 /*INSTITUTO FEDERAL DO CEARÁ (IFCE)*/
 /*BACHARELADO EM ENGENHARIA DE CONTROLE E AUTOMAÇÃO*/
+/*SYLVIELLY S SOUSA*/
 /*DISPOSITIVOS PERIFERICOS*/
 //PROGRAMAS PROF. FABIO
 //SEMESTRE 2020.1
@@ -34,19 +35,19 @@ void main(){
                    for(contador1>0; contador1<=16; contador1+=1){
                            lcd_gotoxy(1,1);
                            printf(lcd_putc,"\f");
-                           lcd_gotoxy((avanco1+=1),1);       //FAZ O AVANCO DE POSICAO DE CADA COLUNA PARA QUE O NOME SE MOVIMENTE NO LCD                            
+                           lcd_gotoxy((avanco1+=2),1);       //FAZ O AVANCO DE POSICAO DE CADA COLUNA PARA QUE O NOME SE MOVIMENTE NO LCD                            
                            printf(lcd_putc,"IFCE",);         //NOME A SER MOVIMENTADO NO LCD
                            delay_ms(100);
                            printf(lcd_putc,"\f");
                            delay_ms(100);
                            
-                           lcd_gotoxy((avanco2+=2),2);     //FAZ O AVANCO DE POSICAO DE CADA COLUNA PARA QUE O NOME SE MOVIMENTE NO LCD
+                           lcd_gotoxy((avanco2+=4),2);     //FAZ O AVANCO DE POSICAO DE CADA COLUNA PARA QUE O NOME SE MOVIMENTE NO LCD
                            printf(lcd_putc,"IFCE",);       //NOME A SER MOVIMENTADO NO LCD
                            delay_ms(100);
                            printf(lcd_putc,"\f",);
                            delay_ms(100);
 
-                           avanco1+=1;
+                           avanco1+=2;
                     }
                     
                     if(contador1>16){
