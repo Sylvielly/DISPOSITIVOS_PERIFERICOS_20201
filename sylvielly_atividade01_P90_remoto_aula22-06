@@ -36,7 +36,7 @@ void main(){
                            lcd_gotoxy(1,1);
                            printf(lcd_putc,"\f");
                            lcd_gotoxy((number+=1),1);                              
-                           printf(lcd_putc,"HELP",);
+                           printf(lcd_putc,"IFCE",);
                            delay_ms(100);
                            n+=1;
                     }
@@ -45,7 +45,7 @@ void main(){
                            lcd_gotoxy(1,2);
                            printf(lcd_putc,"\f",);
                            lcd_gotoxy((number2+=1),2);
-                           printf(lcd_putc,"HELP",);
+                           printf(lcd_putc,"IFCE",);
                            delay_ms(100);
                            printf(lcd_putc,"\f",);
                            n2+=1;
