@@ -36,12 +36,13 @@ void main(){
                            printf(lcd_putc,"\f");
                            lcd_gotoxy((avanco1+=1),1);       //FAZ O AVANCO DE POSICAO DE CADA COLUNA PARA QUE O NOME SE MOVIMENTE NO LCD                            
                            printf(lcd_putc,"IFCE",);         //NOME A SER MOVIMENTADO NO LCD
-                           delay_ms(500);
+                           delay_ms(100);
                            printf(lcd_putc,"\f");
+                           delay_ms(100);
                            
                            lcd_gotoxy((avanco2+=2),2);     //FAZ O AVANCO DE POSICAO DE CADA COLUNA PARA QUE O NOME SE MOVIMENTE NO LCD
                            printf(lcd_putc,"IFCE",);       //NOME A SER MOVIMENTADO NO LCD
-                           delay_ms(500);
+                           delay_ms(100);
                            printf(lcd_putc,"\f",);
                            delay_ms(100);
 
