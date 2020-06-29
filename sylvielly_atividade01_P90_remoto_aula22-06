@@ -36,27 +36,22 @@ void main(){
                            lcd_gotoxy(1,1);
                            printf(lcd_putc,"\f");
                            lcd_gotoxy((number+=1),1);                              
-                           printf(lcd_putc,"IFCE",);
-                           delay_ms(500);
+                           printf(lcd_putc,"HELP",);
+                           delay_ms(100);
+                           n+=1;
                     }
                     
                     if((n2 = 0)||(n2<=16)){
                            lcd_gotoxy(1,2);
                            printf(lcd_putc,"\f",);
                            lcd_gotoxy((number2+=1),2);
-                           printf(lcd_putc,"IFCE",);
-                           delay_ms(500);
+                           printf(lcd_putc,"HELP",);
+                           delay_ms(100);
                            printf(lcd_putc,"\f",);
+                           n2+=1;
+                     
                     }
                      
-                     n+=1;
-                     n2+=1;
-                     
-                     //if((n>16)||(n2>16)){
-                       // n = 0;
-                       // n2 = 0;
-                     //}
-                           
                }
 }
 //FIM DE PROGRAMA           
