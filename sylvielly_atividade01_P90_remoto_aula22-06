@@ -20,7 +20,7 @@
 #include <LCD.c>
 
 //DECLARACAO DE VARIAVEIS
-//CONTADORES 'contador1' e 'contador2'
+//CONTADORES 'contador1'
 unsigned int32 contador1 = 1;             //VARIAVEL DO TIPO 'INT32' NÃO SINALIZADA
 unsigned int32 avanco1 = 0;               //VARIAVEL CRIADA PARA AVANCO DE COLUNA
 unsigned int32 avanco2 = 0;               //VARIAVEL CRIADA PARA AVANCO DE COLUNA
