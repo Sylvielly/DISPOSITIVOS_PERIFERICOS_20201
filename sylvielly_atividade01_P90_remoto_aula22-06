@@ -21,8 +21,7 @@
 
 //DECLARACAO DE VARIAVEIS
 //CONTADORES 'contador1' e 'contador2'
-unsigned int32 contador1 = 0;             //VARIAVEL DO TIPO 'INT32' NÃO SINALIZADA
-unsigned int32 contador2 = 0;             //VARIAVEL DO TIPO 'INT32' NÃO SINALIZADA
+unsigned int32 contador1 = 1;             //VARIAVEL DO TIPO 'INT32' NÃO SINALIZADA
 unsigned int32 avanco1 = 0;               //VARIAVEL CRIADA PARA AVANCO DE COLUNA
 unsigned int32 avanco2 = 0;               //VARIAVEL CRIADA PARA AVANCO DE COLUNA
 
@@ -32,26 +31,29 @@ void main(){
          lcd_init();          //INICIALIZACAO DO LCD
                while(true){
                   
-                    if((contador1 = 0)||(contador1 <= 16)){
+                   for(contador1>0; contador1<=16; contador1+=1){
                            lcd_gotoxy(1,1);
                            printf(lcd_putc,"\f");
                            lcd_gotoxy((avanco1+=1),1);       //FAZ O AVANCO DE POSICAO DE CADA COLUNA PARA QUE O NOME SE MOVIMENTE NO LCD                            
-                           printf(lcd_putc,"SYL IFCE",);         //NOME A SER MOVIMENTADO NO LCD
+                           printf(lcd_putc,"IFCE",);         //NOME A SER MOVIMENTADO NO LCD
+                           delay_ms(500);
+                           printf(lcd_putc,"\f");
+                           
+                           lcd_gotoxy((avanco2+=2),2);     //FAZ O AVANCO DE POSICAO DE CADA COLUNA PARA QUE O NOME SE MOVIMENTE NO LCD
+                           printf(lcd_putc,"IFCE",);       //NOME A SER MOVIMENTADO NO LCD
+                           delay_ms(500);
+                           printf(lcd_putc,"\f",);
                            delay_ms(100);
-                           contador1+=1;                    //INCREMENTA O CONTADOR
+
+                           avanco1+=1;
                     }
                     
-                    if((contador2 = 0)||(contador2 <= 16)){
-                           lcd_gotoxy(1,2);
-                           printf(lcd_putc,"\f",);
-                           lcd_gotoxy((avanco2+=1),2);     //FAZ O AVANCO DE POSICAO DE CADA COLUNA PARA QUE O NOME SE MOVIMENTE NO LCD
-                           printf(lcd_putc,"SYL IFCE",);       //NOME A SER MOVIMENTADO NO LCD
-                           delay_ms(100);
-                           printf(lcd_putc,"\f",);
-                           contador2+=1;                   //INCREMENTA O CONTADOR
+                    if(contador1>16){
+                           contador1 = 0;
+                    }
                      
                     }
                      
                }
-}
+
 //FIM DE PROGRAMA           
