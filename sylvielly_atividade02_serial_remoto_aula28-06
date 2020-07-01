@@ -1,0 +1,100 @@
+/*INSTITUTO FEDERAL DO CEARÁ (IFCE)*/
+/*BACHARELADO EM ENGENHARIA DE CONTROLE E AUTOMAÇÃO*/
+/*SYLVIELLY S SOUSA*/
+/*DISPOSITIVOS PERIFERICOS*/
+//PROGRAMAS PROF. FABIO
+//SEMESTRE 2020.1
+
+//ATIVIDADE 02: ELABORAR PROGRAMA PARA LIGAR E DESLIGAR LEDS NA FORMA SEQUENCIAL REMOTAMENTE SIMULANDO UM CONTROLE EM MALHA ABERTA
+
+//DEFINICAO DOS PINOS DA PORTA 'B' PARA SAIDA COM OS LEDS
+#define LED_B0 pin_b0
+#define LED_B1 pin_b1
+#define LED_B2 pin_b2
+#define LED_B3 pin_b3
+#define LED_B4 pin_b4
+#define LED_B5 pin_b5
+#define LED_B6 pin_b6
+#define LED_B7 pin_b7
+
+//INICIO CABECALHO PADRAO
+#include <18F4550.h>
+#fuses HS, CPUDIV1,PLL5,USBDIV
+#use delay(clock=20000000)
+
+//DECLARACAO DE VARIAVEIS
+//CONTADORES 'contador'
+int contador = 0;             //VARIAVEL DO TIPO 'INT32' NÃO SINALIZADA
+
+
+//INICIO DE PROGRAMA
+
+void main(){
+            
+               while(true){
+                  
+                   if((contador>0)&&(contador<=8)){
+                           
+                           if(contador==1){
+                              output_bit(1,LED_B0);
+                              delay_ms(1000);
+                              output_bit(0,LED_B0);
+                              contador+=1;
+                              }
+                              
+                           
+                            if(contador==2){
+                              output_bit(1,LED_B1);
+                              delay_ms(1000);
+                              output_bit(0,LED_B1);
+                              contador+=1;
+                              }
+                              
+                              
+                            if(contador==3){
+                              output_bit(1,LED_B2);
+                              delay_ms(1000);
+                              output_bit(0,LED_B2);
+                              contador+=1;
+                              }
+                              
+                            if(contador==4){
+                              output_bit(1,LED_B3);
+                              delay_ms(1000);
+                              output_bit(0,LED_B3);
+                              contador+=1;
+                              }
+                              
+                            if(contador==5){
+                              output_bit(1,LED_B4);
+                              delay_ms(1000);
+                              output_bit(0,LED_B4);
+                              contador+=1;
+                              }
+                              
+                            if(contador==6){
+                              output_bit(1,LED_B5);
+                              delay_ms(1000);
+                              output_bit(0,LED_B5);
+                              contador+=1;
+                              }
+                           
+                            if(contador==7){
+                              output_bit(1,LED_B6);
+                              delay_ms(1000);
+                              output_bit(0,LED_B6);
+                              contador+=1;
+                              }
+                 
+                           if(contador==8){
+                              output_bit(1,LED_B7);
+                              delay_ms(1000);
+                              output_bit(0,LED_B7);
+                              contador+=1;
+                              }
+                                      
+                    }
+                     
+               }
+
+}  //FIM DE PROGRAMA
