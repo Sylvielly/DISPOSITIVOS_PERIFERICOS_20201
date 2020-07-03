@@ -20,77 +20,78 @@
 //INICIO CABECALHO PADRAO
 #include <18F4550.h>
 #fuses HS, CPUDIV1,PLL5,USBDIV
+#device ADC = 10
 #use delay(clock=20000000)
+#use rs232(baud=9600, xmit=PIN_C6, rcv=PIN_C7)
 
 //DECLARACAO DE VARIAVEIS
-//CONTADORES 'contador'
-int contador = 0;             //VARIAVEL DO TIPO 'INT32' NÃO SINALIZADA
-
+float valor_ad;               //VARIAVEL DO TIPO 'FLOAT'
+float vad;
 
 //INICIO DE PROGRAMA
-
 void main(){
-            
+   
+   //CONFIGURACAO PORTAS ANALOGICAS
+   setup_adc_ports(AN0_TO_AN1|VSS_VDD);
+   SETUP_ADC(ADC_CLOCK_INTERNAL);
+   SET_ADC_CHANNEL(1);
+  
                while(true){
+                  //LEITURA DO POTENCIOMETRO
+                  valor_ad = read_adc();
+                  delay_ms(10);
+                  vad = ((valor_ad*5)/1023);
                   
-                   if((contador>0)&&(contador<=8)){
+                  printf("SERIAL FUNCIONA");
+                   if((vad>0)&&(vad<=5)){
                            
-                           if(contador==1){
-                              output_bit(1,LED_B0);
+                           if((vad>0.625)&&(vad<=1.25)){
+                              output_bit(LED_B0,1);
                               delay_ms(1000);
-                              output_bit(0,LED_B0);
-                              contador+=1;
+                              output_bit(LED_B0,0);
                               }
                               
-                           
-                            if(contador==2){
-                              output_bit(1,LED_B1);
+                            if((vad>1.25)&&(vad<=1.875)){
+                              output_bit(LED_B1,1);
                               delay_ms(1000);
-                              output_bit(0,LED_B1);
-                              contador+=1;
+                              output_bit(LED_B1,0);
                               }
                               
                               
-                            if(contador==3){
-                              output_bit(1,LED_B2);
+                            if((vad>1.875)&&(vad<=2.5)){
+                              output_bit(LED_B2,1);
                               delay_ms(1000);
-                              output_bit(0,LED_B2);
-                              contador+=1;
+                              output_bit(LED_B2,0);
                               }
                               
-                            if(contador==4){
-                              output_bit(1,LED_B3);
+                            if((vad>2.5)&&(vad<=3.125)){
+                              output_bit(LED_B3,1);
                               delay_ms(1000);
-                              output_bit(0,LED_B3);
-                              contador+=1;
+                              output_bit(LED_B3,0);
                               }
                               
-                            if(contador==5){
-                              output_bit(1,LED_B4);
+                            if((vad>3.125)&&(vad<=3.75)){
+                              output_bit(LED_B4,1);
                               delay_ms(1000);
-                              output_bit(0,LED_B4);
-                              contador+=1;
+                              output_bit(LED_B4,0);
                               }
                               
-                            if(contador==6){
-                              output_bit(1,LED_B5);
+                            if((vad>3.75)&&(vad<=4.375)){
+                              output_bit(LED_B5,1);
                               delay_ms(1000);
-                              output_bit(0,LED_B5);
-                              contador+=1;
+                              output_bit(LED_B5,0);
                               }
                            
-                            if(contador==7){
-                              output_bit(1,LED_B6);
+                            if((vad>4.375)&&(vad<5)){
+                              output_bit(LED_B6,1);
                               delay_ms(1000);
-                              output_bit(0,LED_B6);
-                              contador+=1;
+                              output_bit(LED_B6,0);
                               }
                  
-                           if(contador==8){
-                              output_bit(1,LED_B7);
+                           if(vad==5){
+                              output_bit(LED_B7,1);
                               delay_ms(1000);
-                              output_bit(0,LED_B7);
-                              contador+=1;
+                              output_bit(LED_B7,0);
                               }
                                       
                     }
