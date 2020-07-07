@@ -1,0 +1,70 @@
+/*INSTITUTO FEDERAL DO CEARÁ (IFCE)*/
+/*BACHARELADO EM ENGENHARIA DE CONTROLE E AUTOMAÇÃO*/
+/*SYLVIELLY S SOUSA*/
+/*DISPOSITIVOS PERIFERICOS*/
+//PROGRAMAS PROF. FABIO
+//SEMESTRE 2020.1
+
+//ATIVIDADE 03: ALTERE O PROGRAMA DA PÁGINA 98 PARA GIRAR UM MOTOR CC DE 0 A 100%, CORRESPONDENDO A UMA ENTRADA ANALÓGIVA DE 0 A 4 V NA ENTRADA AN1. 
+
+#include <18F4550.h>
+#fuses HS, CPUDIV1,PLL5,USBDIV
+#use delay(clock=20000000)
+#use rs232(baud=9600, xmit=PIN_C6, rcv=PIN_C7)
+#use standard_io(B)                             //comentar linha caso a biblioteca do LCD seja diferente
+#define use_portB_lcd TRUE                      //comentar linha caso a biblioteca do LCD seja diferente
+#define LCD_TYPE 2
+#include <LCD.c>
+
+void main(){
+               lcd_init();
+               
+//CONFIGURACAO TIMER2 PARA PWM
+setup_timer_2(T2_DIV_BY_4, 249, 1);
+
+                  while(true){
+                        
+                        //DEFINICAO DE VARIAVEIS
+                        float V_ad;
+                        int PWM;
+                        float AD;
+                        //char selection;
+                        //int value;
+                        unsigned int32 vel;
+                        
+                        printf("\r\nDIGITE UM VALOR DE TENSAO ENTRE 0 E 4V:\r\n");
+                        
+
+  
+//ENVIO DE INFORMACAO DA VELOCIDADE DO MOTOR
+lcd_gotoxy(1,1);
+printf(lcd_putc,"\f Motor CC ");
+//lcd_gotoxy(1,2);
+//printf(lcd_putc," Velocidade=%lu ",vel);
+  
+                        if((V_ad>0)&&(V_ad<=4)){
+                                 AD = V_ad*(1023/4);
+                                 PWM = ((V_ad/1023)*100);
+                                 set_pwm1_duty(PWM);
+                                 setup_ccp1(CCP_PWM);
+                              }
+  
+  
+                        
+                    
+}
+}
+
+/*fator de conversao
+  
+  AD ----- > Tensão
+  V_ad = ((4/1023)*AD;
+  AD = V_ad*(1023/4);
+  
+  AD -----> PWM
+  PWM = ((AD/1023)*100)
+  
+  Tensão ------> PWM
+  PWM = (100*(V_ad/4))
+  */
+  
