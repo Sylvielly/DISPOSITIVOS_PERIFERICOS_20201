@@ -1,0 +1,47 @@
+/*INSTITUTO FEDERAL DO CEARÁ (IFCE)*/
+/*BACHARELADO EM ENGENHARIA DE CONTROLE E AUTOMAÇÃO*/
+/*SYLVIELLY S SOUSA*/
+/*DISPOSITIVOS PERIFERICOS*/
+//PROGRAMAS PROF. FABIO
+//SEMESTRE 2020.1
+
+//ATIVIDADE 03: ALTERE O PROGRAMA DA PÁGINA 95 PARA O ENVIO DE SETPOINT 
+
+#include <18F4550.h>
+#fuses HS, CPUDIV1 ,PLL5 ,USBDIV
+#use delay (clock=20000000)
+#use rs232(baud=9600,xmit=pin_c6,rcv=pin_c7)
+
+int32 u,d;
+float32 a,b, c, selection;
+char ponto;
+void main(){
+        
+         while(TRUE){
+               
+               do{
+                     printf("\r\nEnvie um valor entre 0 e 99.999:\r\n");
+                     d=getc()-48;                                                               //48 corresponde ao valor do caractere 0 da tabela ASCII.
+                     u=getc()-48;                                                               //48 corresponde ao valor do caractere 0 da tabela ASCII.
+                     ponto = getc();
+                     a=getc()-48;                                                               //48 corresponde ao valor do caractere 0 da tabela ASCII.
+                     b=getc()-48;                                                               //48 corresponde ao valor do caractere 0 da tabela ASCII.
+                     c=getc()-48;                                                               //48 corresponde ao valor do caractere 0 da tabela ASCII.
+                     selection=(10*d)+(1*u)+(a/10)+(b/100)+(c/1000);
+                     printf("\r\nnumero=%2.3f\r\n",selection);
+                        if ((selection>100)||(selection<0)){
+                              printf("\r\nValor diferente do solicitado!!\r\n");
+                              }                                                              // faixa de valores aceitáveis
+                  } while(selection<100||selection>=0);{
+                           printf("\r\nOK!\r\n");
+                           }
+                     
+                     delay_ms(200);
+                     d = 0;
+                     u = 0;
+                     a = 0;
+                     b = 0;
+                     c = 0;
+}
+
+}
