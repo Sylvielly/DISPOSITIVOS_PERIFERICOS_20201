@@ -6,57 +6,73 @@
 //SEMESTRE 2020.1
 
 //ATIVIDADE 03: ALTERE O PROGRAMA DA PÁGINA 98 PARA GIRAR UM MOTOR CC DE 0 A 100%, CORRESPONDENDO A UMA ENTRADA ANALÓGIVA DE 0 A 4 V NA ENTRADA AN1. 
-
+#define LED_D0 0x7C18
 #include <18F4550.h>
 #device adc=10
 #fuses HS, CPUDIV1,PLL5,USBDIV
 #use delay(clock=20000000)
-#use rs232(baud=9600, xmit=PIN_C6, rcv=PIN_C7)
 #use standard_io(B)                             //comentar linha caso a biblioteca do LCD seja diferente
 #define use_portB_lcd TRUE                      //comentar linha caso a biblioteca do LCD seja diferente
 #define LCD_TYPE 2
 #include <LCD.c>
 
+//DEFINICAO DE VARIAVEIS
+float V_ad;                                       //TENSAO EQUIVALENTE NO AD
+float PWM;                                        //CONFIGURACAO DO DUTY CYCLE DO PWM
+float AD;                                         //PORTA ANALOGICA
+float porcentagem;                                 
+int LED;
+#int_timer0
+void funcao_tempo(){
+      static unsigned int32 n;
+      set_timer0(131+get_timer0());
+      n++;
+      
+      if (n==60){    
+              AD = read_adc();     //LEITURA DA PORTA ANALOGICA
+              if((AD>=0)&&(AD<818)){
+                                 V_ad = AD*0.00488997555;                            //CONVERSAO DE AD --> TENSAO
+                                 //lcd_gotoxy(1,1);
+                                 //printf(lcd_putc,"\f V_ad = %2.2f",V_ad);
+                                 }
+                        porcentagem = ((V_ad/4)*100);                            //CONVERSAO TENSAO --> PORCENTAGEM
+                                 if((porcentagem>=0)&&(porcentagem<100)){
+                                       PWM = (porcentagem*2.5);                 //CONVERSAO PORCENTAGEM --> PWM
+                                       lcd_gotoxy(2,1);
+                                       printf(lcd_putc,"\f Porc = %2.2f",porcentagem);
+                                       set_pwm1_duty(PWM); 
+                                       }
+              n=0;
+              LED=!LED;
+              output_bit(LED_D0,LED);
+              }
+      
+}
+ 
 void main(){
-               lcd_init();
+               lcd_init();                   //INICIALIZACAO DO LCD
+
+//CONFIGURACAO DO TIMER0 PARA EXECUCAO 
+setup_timer_0 (RTCC_DIV_64|RTCC_INTERNAL | RTCC_8_BIT );
+set_timer0(131);
                
+//HABILITACAO DO TIMER0
+enable_interrupts(global);
+enable_interrupts(INT_TIMER0);
+
 //CONFIGURACAO TIMER2 PARA PWM
 setup_timer_2(T2_DIV_BY_4, 249, 1);
+
+//CONFIGURACAO DAS PORTAS ANALOGICAS
 setup_adc_ports(AN0_TO_AN1|VSS_VDD);
 SETUP_ADC(ADC_CLOCK_INTERNAL);
 set_adc_channel(1);
 
                   while(true){
-                        //ENVIO DE INFORMACAO DA VELOCIDADE DO MOTOR
-                        lcd_gotoxy(1,1);
-                        printf(lcd_putc,"\f Motor CC ");
-
-                        //DEFINICAO DE VARIAVEIS
-                        float V_ad;
-                        int PWM;
-                        float AD;
-                        int porcentagem;
-                        float analogico;
-  
-                        analogico = read_adc();
-                        delay_us(10);
-                        AD = analogico;
-                        lcd_gotoxy(1,2);
-                        printf(lcd_putc,"\f");
+                                  setup_ccp1(CCP_PWM);     
+                                 }      
                         
-                        if((AD>0)&&(AD<=1023)){
-                                 V_ad = ((4/1023)*AD);
-                                 porcentagem = ((V_ad/4)*100);
-                                 PWM = ((porcentagem/100)*250);
-                                 
-                                 set_pwm1_duty(PWM);
-                                 setup_ccp1(CCP_PWM);
-                              }
-                              else{
-                                 PWM = 0;
                               }
                               
-}
-}
-
+                 
   
