@@ -20,7 +20,7 @@
 float V_ad;                                       //TENSAO EQUIVALENTE NO AD
 float PWM;                                        //CONFIGURACAO DO DUTY CYCLE DO PWM
 float AD;                                         //PORTA ANALOGICA
-float porcentagem;                                 
+float PORCENTAGEM;                                 
 int LED;
 #int_timer0
 void funcao_tempo(){
@@ -31,20 +31,20 @@ void funcao_tempo(){
       if (n==60){    
               AD = read_adc();     //LEITURA DA PORTA ANALOGICA
               if((AD>=0)&&(AD<818)){
-                                 V_ad = AD*0.00488997555;                            //CONVERSAO DE AD --> TENSAO
-                                 //lcd_gotoxy(1,1);
-                                 //printf(lcd_putc,"\f V_ad = %2.2f",V_ad);
+                                 V_ad = AD*0.00488997555;                         //CONVERSAO DE AD --> TENSAO
+                                 lcd_gotoxy(2,1);
+                                 printf(lcd_putc,"\fTENSAO_AD = %2.2f",V_ad);
                                  }
-                        porcentagem = ((V_ad/4)*100);                            //CONVERSAO TENSAO --> PORCENTAGEM
-                                 if((porcentagem>=0)&&(porcentagem<100)){
-                                       PWM = (porcentagem*2.5);                 //CONVERSAO PORCENTAGEM --> PWM
-                                       lcd_gotoxy(2,1);
-                                       printf(lcd_putc,"\f Porc = %2.2f",porcentagem);
+                        PORCENTAGEM = ((V_ad/4)*100);                            //CONVERSAO TENSAO --> PORCENTAGEM
+                                 if((PORCENTAGEM>=0)&&(PORCENTAGEM<100)){
+                                       PWM = (PORCENTAGEM*2.5);                  //CONVERSAO PORCENTAGEM --> PWM
+                                       lcd_gotoxy(2,2);
+                                       printf(lcd_putc," PORCEN = %2.2f",PORCENTAGEM);
                                        set_pwm1_duty(PWM); 
                                        }
-              n=0;
+              n=0;            
               LED=!LED;
-              output_bit(LED_D0,LED);
+              output_bit(LED_D0,LED);        //TESTA SE TIMER0 TÁ OK
               }
       
 }
@@ -69,10 +69,10 @@ SETUP_ADC(ADC_CLOCK_INTERNAL);
 set_adc_channel(1);
 
                   while(true){
-                                  setup_ccp1(CCP_PWM);     
-                                 }      
+                           setup_ccp1(CCP_PWM);               //HABILITACAO DO PINO DE PWM CCP1
+                           }      
                         
-                              }
+ }
                               
                  
   
