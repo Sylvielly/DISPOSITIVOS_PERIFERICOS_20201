@@ -1,0 +1,52 @@
+/*ENGENHARIA DE CONTROLE E AUTOMAÇÃO*/
+/*SYLVIELLY S SOUSA*/
+/*DISPOSITIVOS PERIFERICOS*/
+//PROGRAMAS PROF. FABIO
+//SEMESTRE 2020.1
+
+//ATIVIDADE 03: ALTERE O PROGRAMA DA PÁGINA 109 PARA GIRAR UM SERVOMOTOR DE 0 A 160 GRAUS CORRESPONDENDO A UM AJUSTE DE 0 A 3V. 
+
+#include <18F4550.h>
+#device adc=10
+#fuses HS, CPUDIV1,PLL5,USBDIV
+#use delay(clock=20000000)
+#use rs232(baud=9600, xmit=PIN_C6, rcv=PIN_C7)
+
+//DEFINICAO DE VARIAVEIS
+unsigned int32 POSICAO_MINIMA = 500;
+float AD;
+float TENSAO;
+unsigned int32 POSICAO1_SERVO;
+
+//FUNCAO PARA CHAMAR AS POSICOES DO SERVO
+void servomotor(unsigned int32 POSICAO1_SERVO){
+            output_bit(0x7C1F,1);
+            delay_us(POSICAO1_SERVO);
+            output_bit(0x7C1F,0);
+            delay_ms(20);
+}
+
+void main(){
+
+//CONFIGURACAO DAS PORTAS ANALOGICAS
+setup_adc_ports(AN0|VSS_VDD);
+SETUP_ADC(ADC_CLOCK_INTERNAL);
+set_adc_channel(0);
+
+                  while(true){
+                  AD = read_adc();
+                  delay_ms(5);
+                  printf("ANALOGICO = %f \n\r",AD);
+                  TENSAO = (AD*0.004887585533);
+                  printf("TENSAO = %f \n\r",TENSAO);                  
+                  if((TENSAO>=0)&&(TENSAO<=3)){
+                                 //POSICAO_MINIMA = 500
+                                 //POSICAO_MAXIMA = 2189
+                                 //(POSICAO_MAXIMA - POSICAO_MINIMA/613.8) = 2.751710655
+                                 POSICAO1_SERVO = ((2.751710655*AD)+POSICAO_MINIMA);
+                                 }
+                                 servomotor(POSICAO1_SERVO);
+                                 printf("SERVO us = %lu",POSICAO1_SERVO);
+                  }
+                  }
+                  
