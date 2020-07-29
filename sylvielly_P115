@@ -1,0 +1,95 @@
+/*ENGENHARIA DE CONTROLE E AUTOMAÇÃO*/
+/*SYLVIELLY S SOUSA*/
+/*DISPOSITIVOS PERIFERICOS*/
+//PROGRAMAS PROF. FABIO
+//SEMESTRE 2020.1
+
+//EXEMPLO P115: ACIONAMENTO DE UM MOTOR DE PASSO UNIPOLAR COM INVERSAO DE GIRO.
+//BOTOES DE INVERSAO DE GIRO: B0 E B1 (HABILITAR PULLUPS PORTA B)
+//SAIDA PARA AS BOBINAS DO MOTOR: D7, D6, D5 E D4
+
+//DEFINICAO DE PINOS
+#define B0 0x7C08
+#define B1 0x7C09
+#define D4 0x7C1C
+#define D5 0x7C1D
+#define D6 0x7C1E
+#define D7 0x7C1F
+
+#include <18F4550.h>
+#byte PORTD = 0xF83
+#fuses HS, CPUDIV1,PLL5,USBDIV
+#use delay(clock=20000000)
+//motor 28Byj-48 possui 2048 passos por rotação ou 0,175° /passo
+
+//DEFINICAO DE VARIAVEIS
+int16 A = 4;
+int16 FLAG_B0;
+int16 FLAG_B1;
+//FUNCAO PARA GIRAR MOTOR DE PASSO
+void GIRA_B0(FLAG_B0){
+     portd = 0b00010000;
+     delay_ms(A);
+     portd = 0b00100000;
+     delay_ms(A);
+     portd = 0b01000000;
+     delay_ms(A);
+     portd = 0b10000000;
+     delay_ms(A); 
+}
+
+void GIRA_B1(FLAG_B1){
+     portd = 0b10000000;
+     delay_ms(A);
+     portd = 0b01000000;
+     delay_ms(A);
+     portd = 0b00100000;
+     delay_ms(A);
+     portd = 0b00010000;
+     delay_ms(A);
+
+}
+void main(){
+
+//CONFIGURACAO PORTAS ENTRADA / SAIDA
+port_b_pullups(TRUE);            //HABILITACAO DE PULLUPS PARA BOTOES
+set_tris_b(0xFF);                //DEFINE PORTA B COMO 'INPUT' (0xFF = 0b11111111)
+set_tris_d(0x00);                //DEFINE PORTA D COMO 'OUTPUT' (0x00 = 0b00000000)
+
+                  while(true){
+                     FLAG_B0 = 0;
+                     FLAG_B1 = 0;
+                     if((INPUT(B0)==0)&&(INPUT(B1)==1)){
+                     FLAG_B0 = !FLAG_B0;
+                     GIRA_B0(FLAG_B0);           //CHAMA FUNCAO PARA GIRAR MOTOR
+                     
+                     //INICIO COMANDOS PARA GIRAR MOTOR PARA B0
+                     /*portd = 0b00010000;
+                     delay_ms(A);
+                     portd = 0b00100000;
+                     delay_ms(A);
+                     portd = 0b01000000;
+                     delay_ms(A);
+                     portd = 0b10000000;
+                     delay_ms(A);*/
+                     //FIM COMANDOS PARA GIRAR MOTOR PARA B0
+                     }
+                     
+                     if((INPUT(B0)==1)&&(INPUT(B1)==0)){
+                     FLAG_B1 = !FLAG_B1;
+                     GIRA_B1(FLAG_B1);           //CHAMA FUNCAO PARA GIRAR MOTOR
+                     
+                     //INICIO COMANDOS PARA GIRAR MOTOR PARA B1
+                     /*portd = 0b10000000;
+                     delay_ms(A);
+                     portd = 0b01000000;
+                     delay_ms(A);
+                     portd = 0b00100000;
+                     delay_ms(A);
+                     portd = 0b00010000;
+                     delay_ms(A);*/
+                     //FIM COMANDOS PARA GIRAR MOTOR PARA B1
+                     }
+                  
+                  }
+}
