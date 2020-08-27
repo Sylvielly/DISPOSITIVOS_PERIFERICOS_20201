@@ -4,51 +4,112 @@
 //PROGRAMAS PROF. FABIO
 //SEMESTRE 2020.1
 
-//EXEMPLO P115: ACIONAMENTO DE UM MOTOR DE PASSO UNIPOLAR COM INVERSAO DE GIRO.
-//BOTOES DE INVERSAO DE GIRO: B0 E B1 (HABILITAR PULLUPS PORTA B)
+//"Projete o acionamento de um elevador através de 2 botões (subir e descer) 
+//de acordo
+//com os dados abaixo associados ao seu número de matrícula:"
+
+//=================================REQUISITOS==================================
+//Nº DE ANDARES  : 2
+//DIAMETRO POLIA : 60 CM
+//ANDAR DE INICIO DE SIMULACAO : TERREO
+//SUBIR : PINO B3
+//DESCER : PINO B1
+//TIPO DE MOTOR : UNIPOLAR (MAIOR TORQUE)
+//PPR : 500
+//MODO : FULL STEP
 //SAIDA PARA AS BOBINAS DO MOTOR: D7, D6, D5 E D4
 
 //DEFINICAO DE PINOS
-#define B0 0x7C08
-#define B1 0x7C09
+#define SUBIR 0x7C0B                   //BOTAO SUBIR : B3
+#define DESCER 0x7C09                  //BOTÃO DESCER : B1
 #define D4 0x7C1C
 #define D5 0x7C1D
 #define D6 0x7C1E
 #define D7 0x7C1F
+//#define MOTOR 0x7C19
 
 #include <18F4550.h>
 #byte PORTD = 0xF83
 #fuses HS, CPUDIV1,PLL5,USBDIV
 #use delay(clock=20000000)
+#use rs232(baud=9600,xmit=PIN_C6,rcv=PIN_C7)
+#int_timer1 
 //motor 28Byj-48 possui 2048 passos por rotação ou 0,175° /passo
+//unsigned int32 PPR = 500;
+//unsigned int32 alfa = 360/PPR;
+//INICIO FUNCAO DE TIMER
+static unsigned int32 GIRA_DESCER = 4;
+static unsigned int32 GIRA_SUBIR = 0;
+                  
+void tempo(){
+   static unsigned int32 n;
+   set_timer1(64536 + get_timer1());
+   n++;
+      if(n == 5){
+         n = 0;
+      }
+} //FIM FUNCAO DE TIMER
 
-//DEFINICAO DE VARIAVEIS
-int16 A = 4;
-int16 FLAG_B0;
-int16 FLAG_B1;
-//FUNCAO PARA GIRAR MOTOR DE PASSO
-void GIRA_B0(FLAG_B0){
-     portd = 0b00010000;
-     delay_ms(A);
-     portd = 0b00100000;
-     delay_ms(A);
-     portd = 0b01000000;
-     delay_ms(A);
-     portd = 0b10000000;
-     delay_ms(A); 
+void MOTOR_SUBIR(){
+
+GIRA_SUBIR+=1;
+                     
+                 switch (GIRA_SUBIR){
+                     
+                     case '1':
+                        OUTPUT_D(0x90);
+                        printf("s");
+                        break;
+                     case '2':
+                        OUTPUT_D(0x48);
+                        printf("s");
+                        break;
+                     case '3':
+                        OUTPUT_D(0x96);
+                        printf("s");
+                        break;
+                     case '4':   
+                        OUTPUT_D(0xC0);
+                        printf("s");
+                        break;
+                        
+                        if(GIRA_SUBIR > 4){
+                              GIRA_SUBIR = 0;
+                           }
+                    }
+
 }
 
-void GIRA_B1(FLAG_B1){
-     portd = 0b10000000;
-     delay_ms(A);
-     portd = 0b01000000;
-     delay_ms(A);
-     portd = 0b00100000;
-     delay_ms(A);
-     portd = 0b00010000;
-     delay_ms(A);
+void MOTOR_DESCER(){
+
+                     GIRA_DESCER-=1;
+                     
+                     switch (GIRA_DESCER){
+                     
+                     case '1':
+                        OUTPUT_D(0xC0);
+                        printf("d");
+                        break;
+                     case '2':
+                        OUTPUT_D(0x60);
+                        printf("d");
+                        break;
+                     case '3':
+                        OUTPUT_D(0x30);
+                        printf("d");
+                        break;
+                     case '4':   
+                        OUTPUT_D(0x90);
+                        printf("d");
+                        break;
+                        
+                        if(GIRA_DESCER <= 0){
+                              GIRA_DESCER = 4;
+                           }
+                       }
 
 }
+
 void main(){
 
 //CONFIGURACAO PORTAS ENTRADA / SAIDA
@@ -56,40 +117,20 @@ port_b_pullups(TRUE);            //HABILITACAO DE PULLUPS PARA BOTOES
 set_tris_b(0xFF);                //DEFINE PORTA B COMO 'INPUT' (0xFF = 0b11111111)
 set_tris_d(0x00);                //DEFINE PORTA D COMO 'OUTPUT' (0x00 = 0b00000000)
 
+setup_timer_1(T1_INTERNAL|T1_DIV_BY_8);
+set_timer1(64536);
+enable_interrupts(GLOBAL);
+enable_interrupts(INT_TIMER1);
+
                   while(true){
-                     FLAG_B0 = 0;
-                     FLAG_B1 = 0;
-                     if((INPUT(B0)==0)&&(INPUT(B1)==1)){
-                     FLAG_B0 = !FLAG_B0;
-                     GIRA_B0(FLAG_B0);           //CHAMA FUNCAO PARA GIRAR MOTOR
+                  
+              if((INPUT(SUBIR)==0)&&(INPUT(DESCER)==1)){
+                MOTOR_SUBIR();
+                }
                      
-                     //INICIO COMANDOS PARA GIRAR MOTOR PARA B0
-                     /*portd = 0b00010000;
-                     delay_ms(A);
-                     portd = 0b00100000;
-                     delay_ms(A);
-                     portd = 0b01000000;
-                     delay_ms(A);
-                     portd = 0b10000000;
-                     delay_ms(A);*/
-                     //FIM COMANDOS PARA GIRAR MOTOR PARA B0
-                     }
-                     
-                     if((INPUT(B0)==1)&&(INPUT(B1)==0)){
-                     FLAG_B1 = !FLAG_B1;
-                     GIRA_B1(FLAG_B1);           //CHAMA FUNCAO PARA GIRAR MOTOR
-                     
-                     //INICIO COMANDOS PARA GIRAR MOTOR PARA B1
-                     /*portd = 0b10000000;
-                     delay_ms(A);
-                     portd = 0b01000000;
-                     delay_ms(A);
-                     portd = 0b00100000;
-                     delay_ms(A);
-                     portd = 0b00010000;
-                     delay_ms(A);*/
-                     //FIM COMANDOS PARA GIRAR MOTOR PARA B1
-                     }
+              if((INPUT(SUBIR)==1)&&(INPUT(DESCER)==0)){                     
+                MOTOR_DESCER();
+                }
                   
                   }
 }
