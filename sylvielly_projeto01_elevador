@@ -28,54 +28,71 @@
 #fuses HS, CPUDIV1,PLL5,USBDIV
 #use delay(clock=20000000)
 #use rs232(baud=9600,xmit=PIN_C6,rcv=PIN_C7)
-#int_timer0
 
-signed long int CONTADOR_TEMPO = 0;
+signed long int CONTADOR_TEMPO_1 = 0;
+signed long int CONTADOR_TEMPO_2 = 3183;
 static unsigned int32 GIRA_DESCER = 4;
 static unsigned int32 GIRA_SUBIR = 0;
 
-//INICIO FUNCAO DE TEMPO | INTERRUPCAO TIMER 0
-void TEMPO(){
-   static unsigned int32 N = 0;
-   set_timer0(100+get_timer0());
-   N++;
-         if(N == 50){
-            N = 0;           
-            }
-} //FIM FUNCAO DE TEMPO | INTERRUPCAO TIMER 0
-
-
-
 //FUNCAO PRA GIRAR MOTOR (SUBIDA)
 void MOTOR_SUBIR(){
-
-GIRA_SUBIR+=1;
-                     
+GIRA_SUBIR+=1;                     
                  switch (GIRA_SUBIR){
                      
                      case '1':
                         OUTPUT_D(0x90);
+                           if(CONTADOR_TEMPO_1<3183){
+                              CONTADOR_TEMPO_1+=1;
+                              }else{
+                               OUTPUT_D(0x00);
+                              }
                         printf("s\r\n");
+                        printf("\r\n CONTADOR = %li\r\n",CONTADOR_TEMPO_1);
                         break;
+                        
                      case '2':
                         OUTPUT_D(0x48);
+                           if(CONTADOR_TEMPO_1<3183){
+                              CONTADOR_TEMPO_1+=1;
+                              }else{
+                               OUTPUT_D(0x00);
+                              }
                         printf("s\r\n");
+                        printf("\r\n CONTADOR = %li\r\n",CONTADOR_TEMPO_1);
                         break;
+                        
                      case '3':
                         OUTPUT_D(0x96);
+                           if(CONTADOR_TEMPO_1<3183){
+                              CONTADOR_TEMPO_1+=1;
+                              }else{
+                               OUTPUT_D(0x00);
+                              }
                         printf("s\r\n");
+                        printf("\r\n CONTADOR = %li\r\n",CONTADOR_TEMPO_1);
                         break;
+                        
                      case '4':   
                         OUTPUT_D(0xC0);
+                           if(CONTADOR_TEMPO_1<3183){
+                              CONTADOR_TEMPO_1+=1;
+                              }else{
+                               OUTPUT_D(0x00);
+                              }
                         printf("s\r\n");
+                        printf("\r\n CONTADOR = %li\r\n",CONTADOR_TEMPO_1);
+      
                         printf("\r\n");
                         break;
                         
-                        if(GIRA_SUBIR > 4){
-                              GIRA_SUBIR = 0;
-                           }
-                    }
+                if((GIRA_SUBIR > 4)&&(CONTADOR_TEMPO_1<3183)){
+                         GIRA_SUBIR = 0;
+                         CONTADOR_TEMPO_1+=1;
+                         printf("\r\n CONTADOR = %li\r\n",CONTADOR_TEMPO_1);           
+                        }
+                 
 
+                 }
 }
 
 //FUNCAO GIRAR MOTOR (DESCIDA)
@@ -87,24 +104,56 @@ void MOTOR_DESCER(){
                      
                      case '1':
                         OUTPUT_D(0xC0);
+                        if(CONTADOR_TEMPO_2>0){
+                              CONTADOR_TEMPO_2-=1;
+                              }else{
+                               OUTPUT_D(0x00);
+                              }
+                        
+                        printf("\r\n CONTADOR = %li\r\n",CONTADOR_TEMPO_2);
                         printf("d\r\n");
                         break;
+                        
                      case '2':
                         OUTPUT_D(0x60);
+                        if(CONTADOR_TEMPO_2>0){
+                              CONTADOR_TEMPO_2-=1;
+                              }else{
+                               OUTPUT_D(0x00);
+                              }
+                
+                        printf("\r\n CONTADOR = %li\r\n",CONTADOR_TEMPO_2);
                         printf("d\r\n");
                         break;
+                        
                      case '3':
                         OUTPUT_D(0x30);
+                        if(CONTADOR_TEMPO_2>0){
+                              CONTADOR_TEMPO_2-=1;
+                              }else{
+                               OUTPUT_D(0x00);
+                              }
+                        printf("s\r\n");
+                        printf("\r\n CONTADOR = %li\r\n",CONTADOR_TEMPO_2);
                         printf("d\r\n");
                         break;
+                        
                      case '4':   
                         OUTPUT_D(0x90);
+                        if(CONTADOR_TEMPO_2>0){
+                              CONTADOR_TEMPO_2-=1;
+                              }else{
+                               OUTPUT_D(0x00);
+                              }
+                        printf("\r\n CONTADOR = %li\r\n",CONTADOR_TEMPO_2);
                         printf("d\r\n");
                         printf("\r\n");
                         break;
                         
-                        if(GIRA_DESCER <= 0){
+                        if((GIRA_DESCER <= 0)&&(CONTADOR_TEMPO_2>0)){
                               GIRA_DESCER = 4;
+                              CONTADOR_TEMPO_2-=1;
+                              printf("\r\n CONTADOR = %li\r\n",CONTADOR_TEMPO_2);
                            }
                        }
 
@@ -116,12 +165,6 @@ void main(){
 port_b_pullups(TRUE);            //HABILITACAO DE PULLUPS PARA BOTOES
 set_tris_b(0xFF);                //DEFINE PORTA B COMO 'INPUT' (0xFF = 0b11111111)
 set_tris_d(0x00);                //DEFINE PORTA D COMO 'OUTPUT' (0x00 = 0b00000000)
-
-//CONFIGURAÇÃO TIMER0
-setup_timer_0(RTCC_DIV_64|RTCC_INTERNAL|RTCC_8_BIT);
-set_timer0(131);
-enable_interrupts(GLOBAL);
-enable_interrupts(INT_TIMER0);
 
           while(true){
                   
