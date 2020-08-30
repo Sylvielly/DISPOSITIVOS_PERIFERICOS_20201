@@ -22,33 +22,93 @@
 //DEFINICAO DE PINOS
 #define SUBIR 0x7C0B                   //BOTAO SUBIR : B3
 #define DESCER 0x7C09                  //BOTÃO DESCER : B1
-#define D4 0x7C1C
-#define D5 0x7C1D
-#define D6 0x7C1E
-#define D7 0x7C1F
-//#define MOTOR 0x7C19
 
 #include <18F4550.h>
-#byte PORTD = 0xF83
+#byte PORTD = 0xF83             //HABILITACAO DO PORT D, LIGANDO TODOS OS PINOS
 #fuses HS, CPUDIV1,PLL5,USBDIV
 #use delay(clock=20000000)
 #use rs232(baud=9600,xmit=PIN_C6,rcv=PIN_C7)
-#int_timer1 
-//motor 28Byj-48 possui 2048 passos por rotação ou 0,175° /passo
-//unsigned int32 PPR = 500;
-//unsigned int32 alfa = 360/PPR;
-//INICIO FUNCAO DE TIMER
-static unsigned int32 GIRA_DESCER = 0;
+#int_timer0
+
+signed long int CONTADOR_TEMPO = 0;
+static unsigned int32 GIRA_DESCER = 4;
 static unsigned int32 GIRA_SUBIR = 0;
-                  
-void tempo(){
-   static unsigned int32 n;
-   set_timer1(64536 + get_timer1());
-   n++;
-      if(n == 5){
-         n = 0;
-      }
-} //FIM FUNCAO DE TIMER
+
+//INICIO FUNCAO DE TEMPO | INTERRUPCAO TIMER 0
+void TEMPO(){
+   static unsigned int32 N = 0;
+   set_timer0(100+get_timer0());
+   N++;
+         if(N == 50){
+            N = 0;           
+            }
+} //FIM FUNCAO DE TEMPO | INTERRUPCAO TIMER 0
+
+
+
+//FUNCAO PRA GIRAR MOTOR (SUBIDA)
+void MOTOR_SUBIR(){
+
+GIRA_SUBIR+=1;
+                     
+                 switch (GIRA_SUBIR){
+                     
+                     case '1':
+                        OUTPUT_D(0x90);
+                        printf("s\r\n");
+                        break;
+                     case '2':
+                        OUTPUT_D(0x48);
+                        printf("s\r\n");
+                        break;
+                     case '3':
+                        OUTPUT_D(0x96);
+                        printf("s\r\n");
+                        break;
+                     case '4':   
+                        OUTPUT_D(0xC0);
+                        printf("s\r\n");
+                        printf("\r\n");
+                        break;
+                        
+                        if(GIRA_SUBIR > 4){
+                              GIRA_SUBIR = 0;
+                           }
+                    }
+
+}
+
+//FUNCAO GIRAR MOTOR (DESCIDA)
+void MOTOR_DESCER(){
+
+                     GIRA_DESCER-=1;
+                     
+                     switch (GIRA_DESCER){
+                     
+                     case '1':
+                        OUTPUT_D(0xC0);
+                        printf("d\r\n");
+                        break;
+                     case '2':
+                        OUTPUT_D(0x60);
+                        printf("d\r\n");
+                        break;
+                     case '3':
+                        OUTPUT_D(0x30);
+                        printf("d\r\n");
+                        break;
+                     case '4':   
+                        OUTPUT_D(0x90);
+                        printf("d\r\n");
+                        printf("\r\n");
+                        break;
+                        
+                        if(GIRA_DESCER <= 0){
+                              GIRA_DESCER = 4;
+                           }
+                       }
+
+}
 
 void main(){
 
@@ -57,70 +117,21 @@ port_b_pullups(TRUE);            //HABILITACAO DE PULLUPS PARA BOTOES
 set_tris_b(0xFF);                //DEFINE PORTA B COMO 'INPUT' (0xFF = 0b11111111)
 set_tris_d(0x00);                //DEFINE PORTA D COMO 'OUTPUT' (0x00 = 0b00000000)
 
-setup_timer_1(T1_INTERNAL|T1_DIV_BY_8);
-set_timer1(64536);
+//CONFIGURAÇÃO TIMER0
+setup_timer_0(RTCC_DIV_64|RTCC_INTERNAL|RTCC_8_BIT);
+set_timer0(131);
 enable_interrupts(GLOBAL);
-enable_interrupts(INT_TIMER1);
+enable_interrupts(INT_TIMER0);
 
-                  while(true){
+          while(true){
                   
               if((INPUT(SUBIR)==0)&&(INPUT(DESCER)==1)){
-                     
-                     GIRA_SUBIR+=1;
-                     
-                 switch (GIRA_SUBIR){
-                     
-                     case '1':
-                        OUTPUT_D(0x90);
-                        printf("s");
-                        break;
-                     case '2':
-                        OUTPUT_D(0x48);
-                        printf("s");
-                        break;
-                     case '3':
-                        OUTPUT_D(0x96);
-                        printf("s");
-                        break;
-                     case '4':   
-                        OUTPUT_D(0xC0);
-                        printf("s");
-                        break;
-                        
-                        if(GIRA_SUBIR > 4){
-                              GIRA_SUBIR = 0;
-                           }
-                    }
-                }
-                     
-                if((INPUT(SUBIR)==1)&&(INPUT(DESCER)==0)){                     
-                     
-                     GIRA_DESCER+=1;
-                     
-                     switch (GIRA_DESCER){
-                     
-                     case '1':
-                        OUTPUT_D(0xC0);
-                        printf("d");
-                        break;
-                     case '2':
-                        OUTPUT_D(0x60);
-                        printf("d");
-                        break;
-                     case '3':
-                        OUTPUT_D(0x30);
-                        printf("d");
-                        break;
-                     case '4':   
-                        OUTPUT_D(0x90);
-                        printf("d");
-                        break;
-                        
-                        if(GIRA_DESCER > 4){
-                              GIRA_DESCER = 0;
-                           }
-                       }
-                     }
-                  
+                  MOTOR_SUBIR();
                   }
+                                     
+              if((INPUT(SUBIR)==1)&&(INPUT(DESCER)==0)){                     
+                  MOTOR_DESCER();
+                  }
+                  
+            }
 }
