@@ -1,15 +1,15 @@
-/*ENGENHARIA DE CONTROLE E AUTOMAÇÃO*/
+/*ENGENHARIA DE CONTROLE E AUTOMAÃ‡ÃƒO*/
 /*SYLVIELLY S SOUSA*/
 /*DISPOSITIVOS PERIFERICOS*/
 //PROGRAMAS PROF. FABIO
 //SEMESTRE 2020.1
 
-//"Projete o acionamento de um elevador através de 2 botões (subir e descer) 
+//"Projete o acionamento de um elevador atravÃ©s de 2 botÃµes (subir e descer) 
 //de acordo
-//com os dados abaixo associados ao seu número de matrícula:"
+//com os dados abaixo associados ao seu nÃºmero de matrÃ­cula:"
 
 //=================================REQUISITOS==================================
-//Nº DE ANDARES  : 2
+//NÂº DE ANDARES  : 2
 //DIAMETRO POLIA : 60 CM
 //ANDAR DE INICIO DE SIMULACAO : TERREO
 //SUBIR : PINO B3
@@ -43,7 +43,7 @@ void MOTOR_SUBIR(){
       
    if(CONTADOR_TEMPO_1<3183){
             
-         switch((CONTADOR_TEMPO_1)){
+         switch((CONTADOR_TEMPO_1)%4){
       
             case '0': 
             OUTPUT_D(0x90);
@@ -79,7 +79,7 @@ void MOTOR_SUBIR(){
 void MOTOR_DESCER(){
     if(CONTADOR_TEMPO_2>0){
             
-         switch((CONTADOR_TEMPO_2)){
+         switch((CONTADOR_TEMPO_2)%4){
       
             case '0': 
             OUTPUT_D(0xC0);
