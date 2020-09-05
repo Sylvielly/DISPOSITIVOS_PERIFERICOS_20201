@@ -34,100 +34,117 @@
 //DEFINICAO DE VARIAVEIS
 signed long int CONTADOR_TEMPO_1 = 0;
 signed long int CONTADOR_TEMPO_2 = 3183;
-//signed long int FLAG_BOTAO_SUBIR = 0;
-//signed long int FLAG_BOTAO_DESCER = 0;
+signed long int FLAG_BOTAO_SUBIR = 0;
+signed long int FLAG_BOTAO_DESCER = 0;
 
 //===================== FUNCAO PARA GIRAR MOTOR DE PASSO ======================
 //FUNCAO PRA GIRAR MOTOR (SUBIDA)
-void MOTOR_SUBIR(){
-      
+//void MOTOR_SUBIR(){
+//}
+
+//FUNCAO GIRAR MOTOR (DESCIDA)
+//void MOTOR_DESCER(){
+     
+//}
+
+//INICIO FUNCAO TEMPO
+void TEMPO(){
+
+   static unsigned int32 N;
+   static unsigned int32 SET_TIMER = 55536;
+   set_timer1(SET_TIMER+get_timer1());
+   N++;
+
+   //if((N == 250)&&(FLAG_BOTAO_SUBIR == 1)){
+   //      N = 0;
+         
+         CONTADOR_TEMPO_1+=1;
+               
    if(CONTADOR_TEMPO_1<3183){
             
          switch((CONTADOR_TEMPO_1)%4){
       
             case '0': 
+            if(N==250){
             OUTPUT_D(0x90);
-            printf("s\r\n");
+            printf("s\r\n");}
             printf("\r\nCONTADOR %li \r\n",CONTADOR_TEMPO_1);
             break;  
             
             case '1': 
+            if(N==500){
             OUTPUT_D(0x48);
-            printf("s\r\n");
+            printf("s\r\n");}
             printf("\r\nCONTADOR %li \r\n",CONTADOR_TEMPO_1);
             break; 
             
             case '2': 
+            if(N==750){
             OUTPUT_D(0x96);
-            printf("s\r\n");
+            printf("s\r\n");}
             printf("\r\nCONTADOR %li \r\n",CONTADOR_TEMPO_1);
             break;
             
             case '3': 
+            if(N==1000){
             OUTPUT_D(0xC0);
-            printf("s\r\n");
+            printf("s\r\n");}
             printf("\r\nCONTADOR %li \r\n",CONTADOR_TEMPO_1);
             break;
             
-            CONTADOR_TEMPO_1+=4;
             
 
          }
    }
-}
-
-//FUNCAO GIRAR MOTOR (DESCIDA)
-void MOTOR_DESCER(){
-    if(CONTADOR_TEMPO_2>0){
+   
+   if(CONTADOR_TEMPO_2>0){
             
          switch((CONTADOR_TEMPO_2)%4){
       
             case '0': 
+            if(N==250){
             OUTPUT_D(0xC0);
-            printf("d\r\n");
+            printf("d\r\n");}
             printf("\r\nCONTADOR %li \r\n",CONTADOR_TEMPO_2);
             break;
             
             case '1': 
+            if(N==500){
             OUTPUT_D(0x60);
-            printf("d\r\n");
+            printf("d\r\n");}
             printf("\r\nCONTADOR %li \r\n",CONTADOR_TEMPO_2);
             break; 
             
             case '2': 
+            if(N==750){
             OUTPUT_D(0x30);
-            printf("d\r\n");
+            printf("d\r\n");}
             printf("\r\nCONTADOR %li \r\n",CONTADOR_TEMPO_2);
             break;
             
             case '3': 
+            if(N==1000){
             OUTPUT_D(0x90);
-            printf("d\r\n");
+            printf("d\r\n");}
             printf("\r\nCONTADOR %li \r\n",CONTADOR_TEMPO_2);
             break;
                       
-            CONTADOR_TEMPO_2-=4;          
          }
-   } 
-}
-
-//INICIO FUNCAO TEMPO
-void TEMPO(){
-
-   signed long int N;
-   signed long int SET_TIMER = 55536;
-   set_timer1(SET_TIMER+get_timer1());
-   N++;
-
-   if((N == 250)&&(INPUT(SUBIR)==0)&&(INPUT(DESCER)==1)){
-         N = 0;
-         MOTOR_SUBIR();
-      }else if((N == 250)&&(INPUT(SUBIR)==1)&&(INPUT(DESCER)==0)){
-         N = 0;
-         MOTOR_DESCER();
-      }
+   }
+   
+   N=0;
+   
+   
 
 }
+   
+   //}else if((N == 250)&&(FLAG_BOTAO_DESCER == 1)){
+   //      N = 0;
+   //      CONTADOR_TEMPO_2-=1;
+   ///      MOTOR_DESCER();
+      //}
+
+//}
 //FIM FUNCAO TEMPO
 
 void main(){
@@ -138,10 +155,21 @@ set_tris_b(0xFF);                //DEFINE PORTA B COMO 'INPUT' (0xFF = 0b1111111
 set_tris_d(0x00);                //DEFINE PORTA D COMO 'OUTPUT' (0x00 = 0b00000000)
 
 //CONFIGURACOES DO TIMER1
-enable_interrupts(GLOBAL);
-enable_interrupts(INT_TIMER1);
 setup_timer_1(T1_INTERNAL|T1_DIV_BY_2);
 set_timer1(55536);
+enable_interrupts(GLOBAL);
+enable_interrupts(INT_TIMER1);
 
-                  while(true){}
+                  while(true){
+                  
+                        if((INPUT(SUBIR)==0)&&(INPUT(DESCER)==1)){
+                              FLAG_BOTAO_SUBIR = !FLAG_BOTAO_SUBIR;
+                           }
+                                     
+                        if((INPUT(SUBIR)==1)&&(INPUT(DESCER)==0)){                     
+                              FLAG_BOTAO_DESCER = !FLAG_BOTAO_DESCER;
+                           }
+                     
+                  
+                  }
 }
