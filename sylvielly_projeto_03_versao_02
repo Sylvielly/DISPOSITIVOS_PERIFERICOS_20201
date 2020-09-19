@@ -1,0 +1,194 @@
+/*ENGENHARIA DE CONTROLE E AUTOMAÇÃO*/
+/*SYLVIELLY S SOUSA*/
+/*DISPOSITIVOS PERIFERICOS*/
+//PROGRAMAS PROF. FABIO
+//SEMESTRE 2020.1
+
+
+//PROJETAR UM CONTROLE PI DE TEMPERATURA
+
+//CONFIGURACOES DE BOTOES
+#define LIGAR  0x7C09       //B1
+#define DESLIGAR 0x7C08     //B0
+#define DIMINUIR 0x7C0B     //B3
+#define AUMENTAR 0x7C0A     //B2
+#define OPERACAO 0x7C0C     //B4
+
+//CONFIGURACOES PADRAO
+#include<18f4550.h>
+#device adc = 10                         //resolucao do adc 10 bits
+#fuses HS, CPUDIV1,PLL5,USBDIV           //habilitacao de fusiveis
+#use delay(clock=20000000)
+#use rs232(baud=9600, xmit=PIN_C6, rcv=PIN_C7)        //configuracao serial
+
+//CONFIGURACOES LCD PICGENIOS
+#define LCD_DB0   PIN_D0
+#define LCD_DB1   PIN_D1
+#define LCD_DB2   PIN_D2
+#define LCD_DB3   PIN_D3
+#define LCD_DB4   PIN_D4
+#define LCD_DB5   PIN_D5
+#define LCD_DB6   PIN_D6
+#define LCD_DB7   PIN_D7
+#define LCD_E     PIN_E1
+#define LCD_RS    PIN_E2
+#include <flex_lcd.c>                     //hiperlink biblioteca lcd picgenios
+
+//DECLARACAO DE VARIAVEIS
+signed long int opcao = 0;
+signed long int setpoint_temperatura = 0;
+signed long int digital_setpoint = 0;
+float AD2 = 0;
+signed long int digital_temperatura = 0;
+signed long int temperatura_graus_atual = 0;
+signed long int FLAG_LIGAR = 0;
+signed long int FLAG_DESLIGAR = 0;
+signed long int FLAG_AUMENTAR = 0;
+signed long int FLAG_OPERACAO = 0;
+
+signed long int PWM_CONFIG = 0;
+signed long int proporcional = 0;
+signed long int erro=0;
+signed long int saida_atual=0;                         //saida de temperatura
+float KP = 0.1;
+signed long int integral = 0;
+float KI=0.091;
+signed long int INTEGRAL_SYS = 0;
+
+
+
+//FUNCAO DE CONFIGURACAO DE TEMPERATURA PARA MENU DE OPCOES
+void TEMPERATURA_AUMENTAR(){
+            setpoint_temperatura+=1;
+            lcd_gotoxy(1,1);
+            printf(lcd_putc,"\f \r\n");
+            printf(lcd_putc,"\fSETPOINT: %li \r\n",setpoint_temperatura);
+            lcd_gotoxy(1,2);
+            printf(lcd_putc,"TEMP ATUAL: %li",temperatura_graus_atual);
+            delay_ms(1000);
+            
+         
+}
+//FUNCAO OPCOES
+void OPCOES(){
+      if(input(AUMENTAR)==1){
+         FLAG_AUMENTAR = 1;
+         }
+         
+         if((FLAG_AUMENTAR==1)&&(input(AUMENTAR)==1)){
+         TEMPERATURA_AUMENTAR();
+         }
+         
+}
+
+
+//INICIO FUNCAO DE TEMPO
+#int_timer0
+void funcao_tempo(){
+      static unsigned int32 n;
+      set_timer0(131+get_timer0());
+      n++;
+      
+   if (setpoint_temperatura > 150){                 //limites de inserir temperatura
+         setpoint_temperatura = 150;
+      }
+            digital_setpoint = setpoint_temperatura*6.82;
+      
+      if (n==100){ 
+            n=0;
+            
+     //configuracao e calculos do PI
+     if(digital_temperatura>0){     
+                  erro = digital_setpoint - digital_temperatura;         
+                  proporcional = KP*erro;
+                  integral = (integral + erro);
+                  INTEGRAL_SYS = (integral*KI);
+            if (INTEGRAL_SYS>920.7){
+                  INTEGRAL_SYS = 920.7;
+               } 
+            if((setpoint_temperatura==0)&&(digital_temperatura==0)){
+               saida_atual = 0;
+           }
+     }
+            
+     }
+     }
+//FIM FUNCAO DE TEMPO
+
+void main(){  
+      
+      lcd_init();
+      port_b_pullups(true);          //habilitacao de pullups (para o teclado matricial)
+
+      //configuracao timer0 para execucao do controlador
+         setup_timer_0 (RTCC_DIV_64|RTCC_INTERNAL | RTCC_8_BIT );
+         set_timer0(131);
+      
+      //inicio configuracao portas analogicas
+         setup_adc_ports(AN0_TO_AN2);
+         setup_adc(adc_clock_internal);         //pino AN0 sera o pino onde o detectara velocidadeRPM 
+         set_adc_channel(2);
+      //fim configuracao portas analogicas
+      
+      //inicio habilitacao interrupcoes
+         enable_interrupts(global);
+         enable_interrupts(INT_TIMER0);
+      //fim habilitacao interrupcoes
+  
+      setup_timer_2(T2_DIV_BY_4, 249, 1);          //preparacao configuracao de PR2 para os pinos de PWM [CCP2]
+      
+                        lcd_gotoxy(1,1);
+                        printf("\f\r\n");
+                        printf(lcd_putc,"\fCONTROLE DE TEMP\r\n");
+                        lcd_gotoxy(1,2);
+                        printf(lcd_putc,"BY SYLVIELLY\r\n");
+                        delay_ms(2000);
+                        lcd_gotoxy(1,1);
+                        printf("\f\r\n");
+                        printf(lcd_putc,"\fB1: LIGAR\r\n");
+                        lcd_gotoxy(1,2);
+                        printf(lcd_putc,"B0: DESLIGAR\r\n");
+                 
+                        
+                        
+                              
+   while(true){
+                 if((input(LIGAR)==0)&&(input(DESLIGAR)==1)){
+                        FLAG_LIGAR = 1;
+                        }
+                      if((FLAG_LIGAR==1)&&(input(LIGAR)==1)){
+                              lcd_gotoxy(1,1);
+                              printf("\f\r\n");
+                              printf(lcd_putc,"\fB2: AUMENTAR\r\n");
+                              lcd_gotoxy(1,2);
+                              printf(lcd_putc,"B3: DIMINUIR\r\n");
+                              delay_ms(1000);
+                              OPCOES();
+                              }
+                              
+   
+               //inicio leitura entrada analogica de temperatura
+                        AD2 = read_adc();
+                        delay_us(100);
+                        digital_temperatura = AD2;                      //conversao da unidade de engenharia lida em AD2 para temperatura
+                        
+                        //fim leitura entrada analogica de velocidade
+                        saida_atual = proporcional+INTEGRAL_SYS; 
+                        temperatura_graus_atual = AD2*0.488758;
+                        
+                        PWM_CONFIG = (saida_atual*0.2443792766);               
+                        if(PWM_CONFIG>=250){
+                           PWM_CONFIG = 250;
+                           }
+                        if(PWM_CONFIG<0){
+                           PWM_CONFIG = 0;
+                           }
+                        set_pwm1_duty(PWM_CONFIG);             //configura razao ciclica [duty cycle = ton / ton+toff]
+                        setup_ccp1(CCP_PWM);                   //envia valor pwm configurado para pino /ccp1
+                  
+                        
+                        //temperatura_graus_atual = digital_temperatura*0.488758;
+                       
+   }
+
+}
