@@ -12,7 +12,7 @@
 #define BOTOES  0x7C09           //B1
 #define AUMENTAR 0x7C0A          //B2
 #define DIMINUIR 0x7C0B          //B3
-//#define OPERACAO 0x7C0C          //B4
+#define VOLTAR 0x7C0C          //B4
 
 //CONFIGURACOES PADRAO
 #include<18f4550.h>                      //BIBLIOTECA PIC18F4550
@@ -46,8 +46,9 @@ signed long int temperatura_graus_atual = 0;    //TEMPERATURA EM GRAUS PORTA ANA
 signed long int FLAG_BOTOES = 0;                //FLAG MODO DE OPERACAO POR BOTOES [B1]
 signed long int FLAG_POTENCIOMETRO = 0;         //FLAG POTENCIOMETRO              
 signed long int FLAG_AUMENTAR = 0;              //FLAG BOTAO B2
-signed long int FLAG_OPERACAO = 0;              
+signed long int FLAG_OPERACAO = 0;              //FLAG MODO DE OPERACAO PARA QUE ESTE ESCOLHA CORRETAMENTE QUANDO O MODO DE OPERACAO B1 OU B0 SEJA SELECIONADO CORRETAMENTE             
 signed long int FLAG_DIMINUIR = 0;              //FLAG BOTAO B3
+signed long int FLAG_VOLTAR = 0;                //FLAG BOTAO B4
 signed long int PWM_CONFIG = 0;                 //CONFIGURACAO PWM
 signed long int proporcional = 0;               //PROPORCIONAL
 signed long int erro=0;                         //ERRO
@@ -156,13 +157,14 @@ void main(){
                         printf(lcd_putc,"B0:POTENCIOMETRO\r\n");       
                               
    while(true){
+            FLAG_OPERACAO+=1;       //CONTADOR PARA O MODO DE OPERACAO. CASO SEJA '1', VAI PARA CONDICIONAL DE BOTOES. CASO SEJA     
             //CONDICIONAL PARA MODO DE OPERACAO DO SETPOINT
             //B1: OPERACAO POR BOTOES | B0: OPERACAO POR POTENCIOMETRO
-            if((input(BOTOES)==0)&&(input(POTENCIOMETRO)==1)){          
+            if((input(BOTOES)==0)&&(input(POTENCIOMETRO)==1)&&(FLAG_OPERACAO==1)){          
                   FLAG_BOTOES = 1;                                      
                   }
                   //SE MODO DE OPERACAO FOR POR MEIO DE BOTOES [B1], PASSA PARA A PROXIMA CONDICAO
-                  if((FLAG_BOTOES==1)&&(input(BOTOES)==1)){
+                  if((FLAG_BOTOES==1)&&(input(BOTOES)==1)&&(FLAG_OPERACAO==1)){
                         lcd_gotoxy(1,1);
                         printf("\f\r\n");
                         printf(lcd_putc,"\fB2:AUMENTAR\r\n");
@@ -172,12 +174,12 @@ void main(){
                         }
                         AUMENTAR_TEMPERATURA();
                         DIMINUIR_TEMPERATURA();
-                        
-            //SE MODO DE OPERACAO FOR POR MEIO DE POTENCIOMETRO [B0], EFETUA LEITURA DA PORTA ANALOGICA      
+         
+            //SE MODO DE OPERACAO FOR POR MEIO DE POTENCIOMETRO [B0], EFETUA LEITURA DA PORTA ANALOGICA
             //INICIO DE LEITURA DE TEMPERATURA DA PORTA ANALOGICA
-            if((input(POTENCIOMETRO)==0)&&(input(BOTOES)==1)&&(FLAG_BOTOES==0)){          
+            if((input(POTENCIOMETRO)==0)&&(input(BOTOES)==1)&&(FLAG_OPERACAO==2)&&(FLAG_BOTOES==0)){          
                   FLAG_POTENCIOMETRO = 1;                                      
-                  }
+               while(FLAG_POTENCIOMETRO==1){
                   AD0 = read_adc();
                   delay_us(100);
                   digital_potenciometro = AD0;                      //CONVERSAO DA UNIDADE DE ENGENHARIA LIDA EM AD2 PARA TEMPERATURA
@@ -187,6 +189,22 @@ void main(){
                   printf(lcd_putc,"\fSETPOINT: %li\r\n",potenciometro_real);
                   delay_ms(1000);
                   FLAG_POTENCIOMETRO = 0;
+                  }
+                }
+           //RETORNAR AO MENU PRINCIPAL
+           if((input(VOLTAR)==0)&&(input(BOTOES)==1)&&(input(POTENCIOMETRO)==1)){
+                     FLAG_VOLTAR = 1;
+                     if(FLAG_VOLTAR==1){
+                        FLAG_BOTOES = 0;
+                        FLAG_POTENCIOMETRO = 0;
+                        FLAG_VOLTAR = 0;
+                        }
+                     }
+                  //CONDICOES CASO FLAG DE OPERACAO SEJA MAIOR QUE '2'   
+                  if(FLAG_OPERACAO>2){
+                     FLAG_OPERACAO = 0;
+                     }
+                  
                
                //INICIO DE LEITURA DE TEMPERATURA DA PORTA ANALOGICA
                AD2 = read_adc();
@@ -210,3 +228,4 @@ void main(){
                setup_ccp2(CCP_PWM);                   //ENVIA VALOR DO PWM CONFIGURADO PARA A PORTA CCP2                        
    }
 }
+
