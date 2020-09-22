@@ -163,7 +163,7 @@ void main(){
                lcd_gotoxy(1,1);
                printf("\f\r\n");
                printf(lcd_putc,"\fPLANTA ON\r\n");
-               delay_ms(700);
+               delay_ms(300);
                }
          if(((FLAG_SELECIONAR==1)&&(setpoint_temperatura>0)&&(FLAG_AUMENTAR==0))||((FLAG_SELECIONAR==1)&&(setpoint_temperatura>0)&&(FLAG_DIMINUIR==0))){
                   //ACIONAMENTO AQUECEDOR
@@ -177,7 +177,7 @@ void main(){
                      printf("\f\r\n");
                      printf(lcd_putc,"SAIDA: %2.2f\r\n",temperatura_graus_atual);
                      printf("\f\r\n");
-                     delay_ms(100);
+                     delay_ms(700);
                      }
                      if(temperatura_graus_atual>=setpoint_temperatura){
                         FLAG_POTENCIOMETRO = 0;
@@ -189,7 +189,7 @@ void main(){
                         printf("\f\r\n");
                         printf(lcd_putc,"SAIDA: %2.2f\r\n",temperatura_graus_atual);
                         printf("\f\r\n");
-                        delay_ms(100);
+                        delay_ms(700);
                         } 
                }
                 
