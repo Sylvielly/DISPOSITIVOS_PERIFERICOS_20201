@@ -38,12 +38,8 @@
 
 //DECLARACAO DE VARIAVEIS    
 float setpoint_temperatura = 27;       //VALOR DE TEMPERATURA DESEJADO PELO USUARIO
-float digital_setpoint = 0;           //ENTRADA EM UNIDADE DE ENGENHARIA
 float AD0 = 0;                                  //PORTA ANALOGICA AN0
 float AD2 = 0;                                  //PORTA ANALOGICA AN2
-float digital_potenciometro = 0;        //VALOR POTENCIOMETRO EM UNIDADE DE ENGENHARIA SAIDA
-float digital_temperatura = 55;        //TEMPERATURA EM UNIDADE DE ENGENHARIA SAIDA
-float saida_graus = 27;
 float potenciometro_real = 0;
 float temperatura_graus_atual = 0;    //TEMPERATURA EM GRAUS PORTA ANALOGICA AN2
 signed long int FLAG_BOTOES = 0;                //FLAG MODO DE OPERACAO POR BOTOES [B1]
@@ -52,7 +48,6 @@ signed long int FLAG_AUMENTAR = 0;              //FLAG BOTAO B2
 signed long int FLAG_OPERACAO = 0;              //FLAG MODO DE OPERACAO PARA QUE ESTE ESCOLHA CORRETAMENTE QUANDO O MODO DE OPERACAO B1 OU B0 SEJA SELECIONADO CORRETAMENTE             
 signed long int FLAG_DIMINUIR = 0;              //FLAG BOTAO B3
 signed long int FLAG_SELECIONAR = 0;            //FLAG BOTAO B4
-float potenciometro_temperatura = 0;
 
 //FUNCAO DE CONFIGURACAO DE TEMPERATURA PARA MENU DE OPCOES
 void AUMENTAR_TEMPERATURA(){
@@ -60,6 +55,7 @@ void AUMENTAR_TEMPERATURA(){
          FLAG_AUMENTAR = 1;                       
          }
          while((FLAG_AUMENTAR==1)&&(input(AUMENTAR)==1)){
+               
                setpoint_temperatura+=1;
                lcd_gotoxy(1,1);
                printf("\f\r\n");
@@ -99,12 +95,10 @@ void main(){
       //INICIO CONFIGURACAO DAS PORTAS ANALOGICAS
          setup_adc_ports(AN0_TO_AN2|VSS_VDD);
          setup_adc(adc_clock_internal);         //PINO AN0 E AN2 SERAO OS OS PINOS DE DETECCAO DE POTENCIOMETRO E TEMPERATURA RESPECTIVAMENTE 
-         set_adc_channel(0);
-         set_adc_channel(2);
       //FIM CONFIGURACAO DAS PORTAS ANALOGICAS
         
       setup_timer_2(T2_DIV_BY_4, 249, 1);          //PREPARACAO CONFIGURACAO DE PR2 PARA OS PINOS DE PWM [CCP2]
-      
+                        //TELA INICIAL - MENU
                         lcd_gotoxy(1,1);
                         printf("\f\r\n");
                         printf(lcd_putc,"\fCONTROLE DE TEMP\r\n");
@@ -129,6 +123,7 @@ void main(){
                         lcd_gotoxy(1,1);
                         printf("\f\r\n");
                         printf(lcd_putc,"\fB2:AUMENTAR\r\n");
+                        //delay_ms(1000);
                         lcd_gotoxy(1,2);
                         printf(lcd_putc,"B3:DIMINUIR\r\n");
                         delay_ms(1000);
@@ -136,42 +131,45 @@ void main(){
                         AUMENTAR_TEMPERATURA();
                         DIMINUIR_TEMPERATURA();
          
-            
-           /* //INICIO CONFIGURACAO DAS PORTAS ANALOGICAS
-            set_adc_channel(0);
             //SE MODO DE OPERACAO FOR POR MEIO DE POTENCIOMETRO [B0], EFETUA LEITURA DA PORTA ANALOGICA
             //INICIO DE LEITURA DE TEMPERATURA DA PORTA ANALOGICA    
             if((input(POTENCIOMETRO)==0)&&(input(BOTOES)==1)&&(FLAG_OPERACAO==2)&&(FLAG_BOTOES==0)){          
                   FLAG_POTENCIOMETRO = 1;                                      
-               if(FLAG_POTENCIOMETRO==1){
+               if((FLAG_POTENCIOMETRO==1)){
+                  set_adc_channel(0);
                   AD0 = read_adc();
                   delay_us(100);
-                  digital_potenciometro = AD0;       //CONVERSAO DA UNIDADE DE ENGENHARIA LIDA EM AD2 PARA TEMPERATURA
-                  potenciometro_real = digital_potenciometro*0.004887585533;
-                  potenciometro_temperatura = potenciometro_real*30;
+                  potenciometro_real = ((AD0*0.0478983382)+27);
+                  setpoint_temperatura = potenciometro_real;
                   lcd_gotoxy(1,1);
                   printf("\f\r\n");
-                  printf(lcd_putc,"\fSETPOINT: %2.2f\r\n",potenciometro_temperatura);
-                  delay_ms(1000);
+                  printf(lcd_putc,"\fSETPOINT: %2.2f\r\n",setpoint_temperatura);
+                  delay_ms(100);
+                  //FLAG_POTENCIOMETRO = 0;
                   }
-                  FLAG_POTENCIOMETRO = 0;
-                }*/
+                  
+                }
                   //CONDICOES CASO FLAG DE OPERACAO SEJA MAIOR QUE '2'   
                   if(FLAG_OPERACAO>2){
                      FLAG_OPERACAO = 0;
                      }
                //INICIO DE LEITURA DE TEMPERATURA DA PORTA ANALOGICA
+               set_adc_channel(2);
                AD2 = read_adc();
-               delay_us(100);
-               digital_temperatura = AD2;                      //CONVERSAO DA UNIDADE DE ENGENHARIA LIDA EM AD2 PARA TEMPERATURA            
-               temperatura_graus_atual = digital_temperatura*0.488758;
+               delay_us(100);            
+               temperatura_graus_atual = AD2*0.488758;
                
           if(input(SELECIONAR)==0){                     //BOTAO QUE CONFIRMA O SETPOINT DESEJADO PARA PODER HABILITAR O AJUSTE
                FLAG_SELECIONAR = 1;
+               lcd_gotoxy(1,1);
+               printf("\f\r\n");
+               printf(lcd_putc,"\fLIGA PLANTA\r\n");
+               delay_ms(700);
                }
-          if(((FLAG_SELECIONAR==1)&&(setpoint_temperatura>0)&&(FLAG_AUMENTAR==0))||((FLAG_SELECIONAR==1)&&(setpoint_temperatura>0)&&(FLAG_DIMINUIR==0))){
+         if(((FLAG_SELECIONAR==1)&&(setpoint_temperatura>0)&&(FLAG_AUMENTAR==0))||((FLAG_SELECIONAR==1)&&(setpoint_temperatura>0)&&(FLAG_DIMINUIR==0))){
                   //ACIONAMENTO AQUECEDOR
                   if(temperatura_graus_atual<setpoint_temperatura){
+                     FLAG_POTENCIOMETRO = 0;
                      OUTPUT_BIT(AQUECEDOR,1);
                      lcd_gotoxy(1,1);
                      printf("\f\r\n");
@@ -180,9 +178,10 @@ void main(){
                      printf("\f\r\n");
                      printf(lcd_putc,"SAIDA: %2.2f\r\n",temperatura_graus_atual);
                      printf("\f\r\n");
-                     delay_ms(700);
+                     delay_ms(100);
                      }
                      if(temperatura_graus_atual>=setpoint_temperatura){
+                        FLAG_POTENCIOMETRO = 0;
                         OUTPUT_BIT(AQUECEDOR,0);
                         lcd_gotoxy(1,1);
                         printf("\f\r\n");
@@ -191,34 +190,28 @@ void main(){
                         printf("\f\r\n");
                         printf(lcd_putc,"SAIDA: %2.2f\r\n",temperatura_graus_atual);
                         printf("\f\r\n");
-                        delay_ms(700);
+                        delay_ms(100);
                         } 
                }
-               
-               /*if(((FLAG_SELECIONAR==1)&&(setpoint_temperatura>0)&&(FLAG_POTENCIOMETRO==0))){
-                  //ACIONAMENTO AQUECEDOR
-                  if(temperatura_graus_atual<potenciometro_temperatura){
+                
+                 if((FLAG_SELECIONAR==1)&&(input(POTENCIOMETRO)==1)&&(FLAG_OPERACAO==2)&&(potenciometro_real>0)){
+                 
+                  if(temperatura_graus_atual<potenciometro_real){
                      OUTPUT_BIT(AQUECEDOR,1);
                      lcd_gotoxy(1,1);
                      printf("\f\r\n");
-                     printf(lcd_putc,"\fSETPOINT: %2.2f\r\n",potenciometro_temperatura);
+                     printf(lcd_putc,"SETPOINT: %2.2f\r\n",setpoint_temperatura);
+                     printf("\f\r\n");
                      lcd_gotoxy(1,2);
                      printf("\f\r\n");
-                     printf(lcd_putc,"SAIDA: %2.2f\r\n",temperatura_graus_atual);
-                     printf("\f\r\n");
-                     delay_ms(700);
-                     }
-                     if(temperatura_graus_atual>=potenciometro_temperatura){
-                        OUTPUT_BIT(AQUECEDOR,0);
-                        lcd_gotoxy(1,1);
-                        printf("\f\r\n");
-                        printf(lcd_putc,"\fSETPOINT: %2.2f\r\n",potenciometro_temperatura);
-                        lcd_gotoxy(1,2);
-                        printf("\f\r\n");
-                        printf(lcd_putc,"SAIDA: %2.2f\r\n",temperatura_graus_atual);
-                        printf("\f\r\n");
-                        delay_ms(700);
-                        }
-               }*/
+                     printf(lcd_putc,"\fSAIDA: %2.2f\r\n",temperatura_graus_atual);
+                     delay_ms(1000);
+                     }  
+               }
+               
+               if(FLAG_SELECIONAR>1){
+                  FLAG_SELECIONAR=0;
+                  }
+               
    }
 }
