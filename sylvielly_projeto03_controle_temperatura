@@ -14,7 +14,7 @@
 #define DIMINUIR      0x7C0B     //B3
 #define SELECIONAR    0x7C0C     //B4
 #define AQUECEDOR     0x7C15     //C5 [PINO ONDE SE ENCONTRA A RESISTENCIA]
-#define COOLER        0x7C12     //C2 [PINO ONDE SE ENCONTRA O COOLER]
+#define DESLIGA       
 
 //CONFIGURACOES PADRAO
 #include<18f4550.h>                      //BIBLIOTECA PIC18F4550
@@ -65,7 +65,7 @@ void AUMENTAR_TEMPERATURA(){
                printf(lcd_putc,"TEMP ATUAL: %2.2f\r\n",temperatura_graus_atual);
                delay_ms(1000);   
                FLAG_AUMENTAR = 0;
-               //digital_setpoint = setpoint_temperatura*2.046077669;    //CONVERSAO TEMPERATURA EM UNIDADE DE ENGENHARIA PARA EFETUAR OS CALCULOS DO CONTROLE
+        
                }
 }
 
@@ -83,7 +83,7 @@ void DIMINUIR_TEMPERATURA(){
                printf(lcd_putc,"TEMP ATUAL: %2.2f\r\n",temperatura_graus_atual);   
                delay_ms(1000);
                FLAG_DIMINUIR = 0;
-               //digital_setpoint = setpoint_temperatura*2.046077669;    //CONVERSAO TEMPERATURA EM UNIDADE DE ENGENHARIA PARA EFETUAR OS CALCULOS DO CONTROLE
+        
                }
 }
 
@@ -97,13 +97,12 @@ void main(){
          setup_adc(adc_clock_internal);         //PINO AN0 E AN2 SERAO OS OS PINOS DE DETECCAO DE POTENCIOMETRO E TEMPERATURA RESPECTIVAMENTE 
       //FIM CONFIGURACAO DAS PORTAS ANALOGICAS
         
-      setup_timer_2(T2_DIV_BY_4, 249, 1);          //PREPARACAO CONFIGURACAO DE PR2 PARA OS PINOS DE PWM [CCP2]
                         //TELA INICIAL - MENU
                         lcd_gotoxy(1,1);
                         printf("\f\r\n");
                         printf(lcd_putc,"\fCONTROLE DE TEMP\r\n");
                         lcd_gotoxy(1,2);
-                        printf(lcd_putc,"BY SYLVIELLY\r\n");
+                        printf(lcd_putc,"\r\r\rPLANTA OFF\r\n");
                         delay_ms(2000);
                         lcd_gotoxy(1,1);
                         printf("\f\r\n");
@@ -163,7 +162,7 @@ void main(){
                FLAG_SELECIONAR = 1;
                lcd_gotoxy(1,1);
                printf("\f\r\n");
-               printf(lcd_putc,"\fLIGA PLANTA\r\n");
+               printf(lcd_putc,"\fPLANTA ON\r\n");
                delay_ms(700);
                }
          if(((FLAG_SELECIONAR==1)&&(setpoint_temperatura>0)&&(FLAG_AUMENTAR==0))||((FLAG_SELECIONAR==1)&&(setpoint_temperatura>0)&&(FLAG_DIMINUIR==0))){
@@ -201,10 +200,6 @@ void main(){
                      lcd_gotoxy(1,1);
                      printf("\f\r\n");
                      printf(lcd_putc,"SETPOINT: %2.2f\r\n",setpoint_temperatura);
-                     printf("\f\r\n");
-                     lcd_gotoxy(1,2);
-                     printf("\f\r\n");
-                     printf(lcd_putc,"\fSAIDA: %2.2f\r\n",temperatura_graus_atual);
                      delay_ms(1000);
                      }  
                }
