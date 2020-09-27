@@ -1,0 +1,100 @@
+/*ENGENHARIA DE CONTROLE E AUTOMAÇÃO*/
+/*SYLVIELLY S SOUSA*/
+/*DISPOSITIVOS PERIFERICOS*/
+//PROGRAMAS PROF. FABIO
+//SEMESTRE 2020.1
+
+//CONFIGURACOES DE BOTOES
+#define B1        0x7C09            //B1 [ENTRA NA OPCAO BOTOES]
+#define AQUECEDOR 0x7C15            //C5 [SAIDA DIGITAL MICRO - ENTRADA DIGITAL PLANTA]
+
+//CONFIGURACOES PADRAO
+#include<18f4550.h>                      //BIBLIOTECA PIC18F4550
+#device adc = 10                         //RESOLUCAO DO ADC 10 BITS
+#fuses HS, CPUDIV1,PLL5,USBDIV           //HABILITACAO DOS FUSIVEIS
+#use delay(clock=20000000)
+#use rs232(baud=9600, xmit=PIN_C6, rcv=PIN_C7)        //CONFIGURACAO SERIAL
+
+//CONFIGURACOES LCD PICGENIOS
+#define LCD_DB0   PIN_D0
+#define LCD_DB1   PIN_D1
+#define LCD_DB2   PIN_D2
+#define LCD_DB3   PIN_D3
+#define LCD_DB4   PIN_D4
+#define LCD_DB5   PIN_D5
+#define LCD_DB6   PIN_D6
+#define LCD_DB7   PIN_D7
+#define LCD_E     PIN_E1
+#define LCD_RS    PIN_E2
+#include <flex_lcd.c>                     //BIBLIOTECA LCD PICGENIOS
+
+//DECLARACAO DE VARIAVEIS    
+int AD2;                            //PORTA ANALOGICA AN2
+float TEMPERATURA_ATUAL;           //TEMPERATURA EM GRAUS PORTA ANALOGICA AN2
+int FLAG_B1 = 0;
+int HEATER_BYTE_1;
+int HEATER_BYTE_2;
+int IN_VALVE_BYTE_1;
+int IN_VALVE_BYTE_2;
+int OUT_VALVE_BYTE_1;
+int OUT_VALVE_BYTE_2;
+
+//FUNCOES DO SERIAL REMOTE TANK
+void LIGA_AQUECEDOR(){
+     HEATER_BYTE_1 = 0x02;
+     HEATER_BYTE_2 = 0x01;
+     putc("0x02");
+     putc("0x01");
+}
+
+void LIGA_VALVULA_ENTRADA(){
+     IN_VALVE_BYTE_1 = 0x00;
+     IN_VALVE_BYTE_2 = 0x00;
+     printf("%x\r\n",IN_VALVE_BYTE_1);
+     printf("%x\r\n",IN_VALVE_BYTE_2);
+}
+
+void LIGA_VALVULA_SAIDA(){
+     OUT_VALVE_BYTE_1 = 0x01;
+     OUT_VALVE_BYTE_2 = 0x00;
+     printf("%x\r\n",OUT_VALVE_BYTE_1);
+     printf("%x\r\n",OUT_VALVE_BYTE_2);
+}
+
+void main(){
+      
+      lcd_init();                    //INICIALIZACAO LCD
+      port_b_pullups(true);          //HABILITACAO DOS PULLUPS PARA BOTOES DA PLACA
+
+      //INICIO CONFIGURACAO DAS PORTAS ANALOGICAS
+         setup_adc_ports(AN0_TO_AN3|VSS_VDD);
+         setup_adc(adc_clock_internal);                              //PINO AN0 E AN2 SERAO OS OS PINOS DE DETECCAO DE POTENCIOMETRO E TEMPERATURA RESPECTIVAMENTE 
+      //FIM CONFIGURACAO DAS PORTAS ANALOGICAS
+        
+      
+                        //TELA INICIAL - MENU
+                        printf(lcd_putc,"\fCONTROLE DE TEMP\r\n");
+                        printf(lcd_putc,"APERTE B1\r\n");
+                        
+               
+                        
+   while(true){
+         if(input(B1)==0){
+            FLAG_B1 = 1;
+            }
+             
+             if((input(B1)==1)&&(FLAG_B1 == 1)){
+                        
+                        lcd_gotoxy(1,1);
+                        printf("\f\r\n");     
+                        printf(lcd_putc,"\fTEMP ATUAL: %2.0f\r\n",TEMPERATURA_ATUAL);
+                        delay_ms(100);
+                        set_adc_channel(2);
+                        AD2 = read_adc();
+                        delay_us(100);            
+                        TEMPERATURA_ATUAL = AD2*0.488758;      //CONVERSAO DA LEITURA EM VALOR DE TEMPERATURA
+                     }
+                     //OUTPUT_BIT(AQUECEDOR,1);
+                     LIGA_AQUECEDOR();  
+   }
+}
