@@ -37,7 +37,6 @@ int HEATER_BYTE_1;
 int HEATER_BYTE_2;
 int IN_VALVE_BYTE_1;
 int IN_VALVE_BYTE_2;
-int ALERTA_TEMP_MAX = 0x13;
 int VOLUME_BYTE_1;
 int TEMPERATURA_BYTE_1;
 int16 VALOR_H;
@@ -52,43 +51,31 @@ void PARADA(){
 }
 //FUNCOES DO SERIAL REMOTE TANK
 void LIGA_AQUECEDOR(){
-     HEATER_BYTE_1 = 0x02;
-     HEATER_BYTE_2 = 0x01;
-     putc(HEATER_BYTE_1);
-     putc(HEATER_BYTE_2);
+     putc(0x02);
+     putc(0x01);
 }
 
 void LIGA_VALVULA_ENTRADA(){
-     IN_VALVE_BYTE_1 = 0x00;
-     IN_VALVE_BYTE_2 = 0x01;
-     putc(IN_VALVE_BYTE_1);
-     putc(IN_VALVE_BYTE_2);     
+     putc(0x00);
+     putc(0x01);     
 }
 
 void DESLIGA_AQUECEDOR(){
-     HEATER_BYTE_1 = 0x02;
-     HEATER_BYTE_2 = 0x00;
-     putc(HEATER_BYTE_1);
-     putc(HEATER_BYTE_2);
-     putc(ALERTA_TEMP_MAX);
+     putc(0x02);
+     putc(0x00);
 }
 
 void DESLIGA_VALVULA_ENTRADA(){
-     IN_VALVE_BYTE_1 = 0x01;
-     IN_VALVE_BYTE_2 = 0x00;
-     putc(IN_VALVE_BYTE_1);
-     putc(IN_VALVE_BYTE_2);
-     
+     putc(0x01);
+     putc(0x00);
 }
 
 void LEITURA_VOLUME(){
-     VOLUME_BYTE_1 = 0x30;
-     putc(VOLUME_BYTE_1);
+     putc(0x30);
 }
 
 void LEITURA_TEMPERATURA(){
-     TEMPERATURA_BYTE_1 = 0x31;
-     putc(TEMPERATURA_BYTE_1);
+     putc(0x31);
 }
 //INTERRUPCAO DA SERIAL [FUNCIONANDO]
 #int_rda
@@ -99,7 +86,7 @@ void INTERRUPCAO_SERIAL(){
          
          TEMP_H = getc();
          TEMP_L = getc();
-         AD1  = ((TEMP_H<<8)|(TEMP_L))*1;
+         AD1  = ((TEMP_H<<8)|(TEMP_L));
 }
 void main(){
       
@@ -125,16 +112,18 @@ void main(){
               LIGA_AQUECEDOR();
               LEITURA_VOLUME();
               LEITURA_TEMPERATURA();
+              delay_ms(100);
               lcd_gotoxy(1,1);
               printf(lcd_putc,"\fVOLUME: %lu \r\n",AD0);
               lcd_gotoxy(1,2);
               printf(lcd_putc,"TEMP: %lu \r\n",AD1);
               delay_ms(50);
-             }while((AD1>0)&&(AD1<TEMP_MAX));
+             }while(AD1<TEMP_MAX);
                   if(AD1>=TEMP_MAX){
                      DESLIGA_AQUECEDOR();
-                     PARADA();
-                     FLAG_B1 = 0;
+                     LEITURA_VOLUME();
+                     LEITURA_TEMPERATURA();
+                     delay_ms(100);
                      lcd_gotoxy(1,1);
                      printf(lcd_putc,"\fVOLUME: %lu \r\n",AD0);
                      lcd_gotoxy(1,2);
