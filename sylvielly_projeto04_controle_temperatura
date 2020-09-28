@@ -6,7 +6,6 @@
 
 //CONFIGURACOES DE BOTOES
 #define B1        0x7C09            //B1 [ENTRA NA OPCAO BOTOES]
-#define AQUECEDOR 0x7C15            //C5 [SAIDA DIGITAL MICRO - ENTRADA DIGITAL PLANTA]
 
 //CONFIGURACOES PADRAO
 #include<18f4550.h>                      //BIBLIOTECA PIC18F4550
@@ -33,23 +32,18 @@
 unsigned int32 AD0;
 unsigned int32 AD1;
 int FLAG_B1 = 0;
-int HEATER_BYTE_1;
-int HEATER_BYTE_2;
-int IN_VALVE_BYTE_1;
-int IN_VALVE_BYTE_2;
-int VOLUME_BYTE_1;
-int TEMPERATURA_BYTE_1;
 int16 VALOR_H;
 int16 VALOR_L;
 int16 TEMP_H;
 int16 TEMP_L;
 int16 TEMP_MAX = 80;
 
+//FUNCOES DO SERIAL REMOTE TANK
 void PARADA(){
      putc(0x00);
      putc(0x00);
 }
-//FUNCOES DO SERIAL REMOTE TANK
+
 void LIGA_AQUECEDOR(){
      putc(0x02);
      putc(0x01);
@@ -77,7 +71,7 @@ void LEITURA_VOLUME(){
 void LEITURA_TEMPERATURA(){
      putc(0x31);
 }
-//INTERRUPCAO DA SERIAL [FUNCIONANDO]
+//INTERRUPCAO DA SERIAL
 #int_rda
 void INTERRUPCAO_SERIAL(){
          VALOR_H = getc();
@@ -95,39 +89,39 @@ void main(){
 
       //inicio habilitacao interrupcoes
          enable_interrupts(global);
-         enable_interrupts(int_rda);            //interrupcao para serial
-         
+         enable_interrupts(int_rda);            //INTERRUPCAO SERIAL
+      //COMANDO PARA LIGAR VALVULA DE ENTRADA 
          LIGA_VALVULA_ENTRADA();
          delay_ms(100);
          DESLIGA_VALVULA_ENTRADA();
          delay_ms(5000);
          PARADA();
- 
+//LOGICA DE HABILITACAO DO AQUECEDOR | CONTROLE DE TEMPERATURA 
    while(true){
-      if(input(B1)==0){
+      if(input(B1)==0){          //BOTAO QUE HABILITA LIGAR AQUECEDOR
          FLAG_B1 = !FLAG_B1;
          }
          if(FLAG_B1 == 1){
-            do{
-              LIGA_AQUECEDOR();
-              LEITURA_VOLUME();
-              LEITURA_TEMPERATURA();
+            do{                   
+              LIGA_AQUECEDOR();           //FUNCAO QUE HABILITA AQUECEDOR
+              LEITURA_VOLUME();           //REALIZA LEITURA DE NIVEL
+              LEITURA_TEMPERATURA();      //REALIZA A LEITURA ATUALIZADA DE TEMPERATURA
               delay_ms(100);
               lcd_gotoxy(1,1);
-              printf(lcd_putc,"\fVOLUME: %lu \r\n",AD0);
+              printf(lcd_putc,"\fVOLUME: %lu %%\r\n",AD0);
               lcd_gotoxy(1,2);
-              printf(lcd_putc,"TEMP: %lu \r\n",AD1);
+              printf(lcd_putc,"TEMP: %lu %cC\r\n",AD1,0xdf);
               delay_ms(50);
              }while(AD1<TEMP_MAX);
                   if(AD1>=TEMP_MAX){
-                     DESLIGA_AQUECEDOR();
-                     LEITURA_VOLUME();
-                     LEITURA_TEMPERATURA();
+                     DESLIGA_AQUECEDOR();       //FUNCAO QUE DESABILITA AQUECEDOR
+                     LEITURA_VOLUME();          //REALIZA LEITURA DE NIVEL
+                     LEITURA_TEMPERATURA();     //REALIZA A LEITURA ATUALIZADA DE TEMPERATURA
                      delay_ms(100);
                      lcd_gotoxy(1,1);
-                     printf(lcd_putc,"\fVOLUME: %lu \r\n",AD0);
+                     printf(lcd_putc,"\fVOLUME: %lu %%\r\n",AD0);
                      lcd_gotoxy(1,2);
-                     printf(lcd_putc,"TEMP: %lu \r\n",AD1);
+                     printf(lcd_putc,"TEMP: %lu %cC\r\n",AD1,0xdf);
                      delay_ms(50);
                      }
             }
